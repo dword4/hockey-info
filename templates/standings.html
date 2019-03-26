@@ -1,0 +1,23 @@
+
+{% include 'navigation.html' %}
+
+<table>
+	<tr>
+		<td>Team</td>
+		<td>Points</td>
+		<td>Division</td>
+		<td>Rank</td>
+	</tr>
+{% for team in standings %}
+	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #86C6E0; font-size: 32px;" {% elif team.team_name in wc %}style="background: #C8C8C8; font-size: 22px"{% else %} style="font-size: 22px;" {% endif %}>
+	<td>{{ team.team_name }}</td><td>{{ team.team_points }}</td><td>{{ team.division }}</td>
+		<td>
+		{% if team.team_rank_division | int in [1,2,3] %}
+			<strong>{{ team.team_rank_division }}</strong>
+		{% else %}
+			{{ team.team_rank_division }}{% if team.team_name in wc %}{% endif %}
+		{% endif %}
+	</td>
+	</tr>
+{% endfor %}
+</table>

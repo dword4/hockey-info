@@ -1,0 +1,40 @@
+<!doctype html>
+<title>Scores</title>
+<style>
+.enjoy-css {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  width: 160px;
+  padding: 20px;
+  overflow: hidden;
+  border: none;
+  -webkit-border-radius: 19px;
+  border-radius: 9px;
+  font: normal 28px/1 "Times New Roman", Times, serif;
+  color: rgba(0,0,0,1);
+  text-align: center;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  background: #86C6E0;
+  -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.3) ;
+  box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.3) ;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.2) ;
+}
+</style>
+{% include 'navigation.html' %}
+{% for item in scores %}
+	<table border="0" style="width: 25%; margin-left: 25%;" class="enjoy-css">
+		<tr>
+			<td style="width: 50%; text-align: right">{{ item.away_team }}</td>
+			<td> {{ item.away_score }}</td>
+		</tr>
+		<tr>
+	<td style="text-align: right">{{ item.home_team }}</td>
+	<td>{{ item.home_score }}</td>
+		</tr>
+		<tr>
+	<td colspan="2" style="text-align: center">{{ item.game_state }}</td>
+		</tr>
+	</table><br />
+{% endfor %}
