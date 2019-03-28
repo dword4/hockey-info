@@ -2,9 +2,11 @@ from flask import Flask, render_template
 import requests
 import json
 import arrow
+
 app = Flask(__name__)
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=int("5000"))
+
 # get team abbreviation from ID
 def getTeamAbbr(ID):
     ret = False
@@ -59,29 +61,39 @@ def hello_world():
 @app.route('/standings')
 def get_standings():
 	# first we gather the regular standings
-	url = 'https://statsapi.web.nhl.com/api/v1/standings'
+	url = 'https://statsapi.web.nhl.com/api/v1/standings/byDivision'
 	records = requests.get(url).json()
+	# 0 -> metro, 1-> atlantic, 2 -> central 3-> pacific
 	standings = []
+	master = []
 	for r in records['records']:
+		conference_name = r['conference']['name']
 		division_name = r['division']['name']
-			
+		print("%s - %s " %(conference_name, division_name))
 		for team in r['teamRecords']:
+			division_name = r['division']['name']
 			team_name = team['team']['name']
 			team_points = team['points']
 			team_rank_division = team['divisionRank']
 			team_rank_wildcard = team['wildCardRank']
 			team_standings = {'team_name':team_name,'team_points':team_points,'team_rank_division':team_rank_division,'team_rank_wildcard':team_rank_wildcard,'division':division_name}
 			standings.append(team_standings)
+		master.append(standings)
+		standings = []
+	east = master[0]
+	east += master[1]
+	west = master[2]
+	west += master[3]
+
 	# now to collect wildcard info
 	url = 'https://statsapi.web.nhl.com/api/v1/standings/wildCard'
 	records = requests.get(url).json()
 	(eastern, western) = records['records']
 	wc_teams = []
 	for i in [0,1]:
-		wc_teams.append(eastern['teamRecords'][i]['team']['name'])
-		wc_teams.append(western['teamRecords'][i]['team']['name'])
-
-	return render_template('standings.html',standings=standings,wc=wc_teams)
+			wc_teams.append(eastern['teamRecords'][i]['team']['name'])
+			wc_teams.append(western['teamRecords'][i]['team']['name'])
+	return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,wc=wc_teams)
 
 @app.route('/scores')
 def get_scores():
