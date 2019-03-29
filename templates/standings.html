@@ -1,12 +1,12 @@
 
 {% include 'navigation.html' %}
 <h2>Eastern Conference</h2>
-<table style="width: 60%">
+<table style="width: 75%">
 	<tr>
-		<td>Team</td>
-		<td>Points</td>
-		<td>Division</td>
-		<td>Rank</td>
+		<td style="width: 50%">Team</td>
+		<td style="width: 5%;">Points</td>
+		<td style="width: 30%;">Division</td>
+		<td style="width: 5%;">Rank</td>
 	</tr>
 {% for team in east_conf %}
 	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #86C6E0; font-size: 32px;" {% elif team.team_name in wc %}style="background: #C8C8C8; font-size: 22px"{% else %} style="font-size: 22px;" {% endif %}>
@@ -22,12 +22,12 @@
 {% endfor %}
 </table>
 <h2>Western Conference</h2>
-<table style="width: 60%">
+<table style="width: 75%">
 	<tr>
-		<td>Team</td>
-		<td>Points</td>
-		<td>Division</td>
-		<td>Rank</td>
+		<td style="width: 50%">Team</td>
+		<td style="width: 5%;">Points</td>
+		<td style="width: 30%;">Division</td>
+		<td style="width: 5%;">Rank</td>
 	</tr>
 {% for team in west_conf %}
 	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #86C6E0; font-size: 32px;" {% elif team.team_name in wc %}style="background: #C8C8C8; font-size: 22px"{% else %} style="font-size: 22px;" {% endif %}>
