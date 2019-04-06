@@ -1,11 +1,14 @@
 <!doctype html>
 <title>Scores</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
 <style>
 .enjoy-css {
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
   width: 160px;
+  left: 30%;
   padding: 20px;
   overflow: hidden;
   border: none;
@@ -20,11 +23,15 @@
   -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.3) ;
   box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.3) ;
   text-shadow: 1px 1px 1px rgba(0,0,0,0.2) ;
+  position: relative; 
 }
 </style>
+
 {% include 'navigation.html' %}
+<content id="content">
 {% for item in scores %}
-	<table border="0" style="width: 25%; margin-left: 25%;" class="enjoy-css">
+	<!-- <table border="0" style="width: 25%; margin-left: 25%;" class="enjoy-css"> -->
+	<table class="enjoy-css">
 		<tr>
 			<td style="width: 50%; text-align: right">{{ item.away_team }}</td>
 			<td> {{ item.away_score }}</td>
@@ -38,3 +45,4 @@
 		</tr>
 	</table><br />
 {% endfor %}
+</content>
