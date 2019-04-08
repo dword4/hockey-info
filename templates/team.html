@@ -1,0 +1,37 @@
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script> 
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% include 'navigation.html' %}
+<script>
+$(document).ready( function () {
+    $('#table_id').DataTable( {
+		paging: false
+	});
+} );
+</script>
+<br /><br/>
+<table id="table_id" class="display">
+	<thead>
+		<tr>
+			<th>Player</th>
+			<th>GP</th>
+			<th>G</th>
+			<th>A</th>
+			<th>P</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for p in roster_stats %}
+		<tr>
+			<td>{{ p.NAME }}</td>
+			<td>{{ p.GP }}</td>
+			<td>{{ p.G }}</td>
+			<td>{{ p.A }}</td>
+			<td>{{ p.P }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>

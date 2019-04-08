@@ -58,6 +58,45 @@ def getTeamAbbr(ID):
 def hello_world():
 	return render_template('index.html')
 
+@app.route('/team/<team_id>')
+def get_team(team_id):
+	# TODO: implement ID check that doesn't rely upon an API query
+
+	# first we gather the regular standings
+	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season=20182019,person(name,stats(splits=[statsSingleSeason]))))'
+	records = requests.get(url).json()
+	# desired stats: GP, G, A, P, +/-, PIM, PPG, PPP, SHG, SHP, GWG, OTG, S and S%
+	roster = records['teams'][0]['franchise']['roster']['roster']
+	ps = []
+	for player in roster:
+		player_name = player['person']['fullName']
+		player_position = player['person']['primaryPosition']['code']
+		try:
+			player_stats = player['person']['stats'][0]['splits'][0]['stat']
+		except:
+			# no stats found
+			pass
+		if player_position != "G":
+			print(player_name)
+			print(player_stats['goals'])
+			stats_gp = player_stats['games']
+			stats_g = player_stats['goals']
+			stats_a = player_stats['assists']
+			stats_p = player_stats['points']
+			stats_plusMinus = player_stats['plusMinus']
+			stats_pim = player_stats['penaltyMinutes']
+			stats_ppg = player_stats['powerPlayGoals']
+			stats_ppp = player_stats['powerPlayPoints']
+			stats_shg = player_stats['shortHandedGoals']
+			stats_shp = player_stats['shortHandedPoints']
+			stats_gwg = player_stats['gameWinningGoals']
+			stats_otg = player_stats['overTimeGoals']
+			stats_s = player_stats['shots']
+			stats_sp = player_stats['shotPct']
+			statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p}	
+			ps.append(statline)
+	return render_template('team.html', t=team_id, roster_stats=ps)
+
 @app.route('/standings')
 def get_standings():
 	# first we gather the regular standings
@@ -72,11 +111,12 @@ def get_standings():
 		print("%s - %s " %(conference_name, division_name))
 		for team in r['teamRecords']:
 			division_name = r['division']['name']
+			team_id = team['team']['id']
 			team_name = team['team']['name']
 			team_points = team['points']
 			team_rank_division = team['divisionRank']
 			team_rank_wildcard = team['wildCardRank']
-			team_standings = {'team_name':team_name,'team_points':team_points,'team_rank_division':team_rank_division,'team_rank_wildcard':team_rank_wildcard,'division':division_name}
+			team_standings = {'team_id':team_id,'team_name':team_name,'team_points':team_points,'team_rank_division':team_rank_division,'team_rank_wildcard':team_rank_wildcard,'division':division_name}
 			standings.append(team_standings)
 		master.append(standings)
 		standings = []
@@ -102,21 +142,25 @@ def get_scores():
 	url = 'https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.linescore'
 	games = requests.get(url).json()
 	game_data = [] 
-	for g in games['dates'][0]['games']:
-		away_team = getTeamAbbr(g['teams']['away']['team']['id'])
-		home_team = getTeamAbbr(g['teams']['home']['team']['id'])
-		away_score = g['teams']['away']['score']
-		home_score = g['teams']['home']['score']
-		game_state = ''
-		if g['status']['abstractGameState'] == 'Final':
-			# final score
-			game_state = 'Final'
-		elif g['status']['abstractGameState'] == 'Live':
-			game_state = g['linescore']['currentPeriodOrdinal'] + ' ' + g['linescore']['currentPeriodTimeRemaining']
-		elif g['status']['abstractGameState'] == 'Preview':
-			utc = arrow.get(g['gameDate'])
-			print(utc.to('US/Eastern').format('HH:mm ZZZ'))
-			game_state = utc.to('US/Eastern').format('HH:mm ZZZ')
-		game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state}
-		game_data.append(game_details)
-	return render_template('scores.html',scores=game_data)
+	if games['totalItems'] == 0:
+		# no games found
+		return render_template('scores.html',msg="no games today :(")
+	else:
+		for g in games['dates'][0]['games']:
+			away_team = getTeamAbbr(g['teams']['away']['team']['id'])
+			home_team = getTeamAbbr(g['teams']['home']['team']['id'])
+			away_score = g['teams']['away']['score']
+			home_score = g['teams']['home']['score']
+			game_state = ''
+			if g['status']['abstractGameState'] == 'Final':
+				# final score
+				game_state = 'Final'
+			elif g['status']['abstractGameState'] == 'Live':
+				game_state = g['linescore']['currentPeriodOrdinal'] + ' ' + g['linescore']['currentPeriodTimeRemaining']
+			elif g['status']['abstractGameState'] == 'Preview':
+				utc = arrow.get(g['gameDate'])
+				print(utc.to('US/Eastern').format('HH:mm ZZZ'))
+				game_state = utc.to('US/Eastern').format('HH:mm ZZZ')
+			game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state}
+			game_data.append(game_details)
+		return render_template('scores.html',scores=game_data)

@@ -10,17 +10,18 @@
 		<td style="width: 5%;">Rank</td>
 	</tr>
 {% for team in east_conf %}
-	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #86C6E0; font-size: 32px;" {% elif team.team_name in wc %}style="background: #C8C8C8; font-size: 22px"{% else %} style="font-size: 22px;" {% endif %}>
-	<td>{{ team.team_name }}</td><td>{{ team.team_points }}</td><td>{{ team.division }}</td>
+	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #C7D9B7; font-size: 32px;" {% elif team.team_name in wc %}style="background: #FFD9DA; font-size: 22px"{% else %} style="background: #C8C8C8; font-size: 22px;" {% endif %}>
+	<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.division }}</td>
 		<td>
 		{% if team.team_rank_division | int in [1,2,3] %}
 			<strong>{{ team.team_rank_division }}</strong>
 		{% else %}
-			{{ team.team_rank_division }}{% if team.team_name in wc %}{% endif %}
+			{{ team.team_rank_division }}{% if team.team_name in wc %} *{% endif %}
 		{% endif %}
 	</td>
 	</tr>
 {% endfor %}
+
 </table>
 <h2>Western Conference</h2>
 <table style="width: 75%">
@@ -31,13 +32,13 @@
 		<td style="width: 5%;">Rank</td>
 	</tr>
 {% for team in west_conf %}
-	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #86C6E0; font-size: 32px;" {% elif team.team_name in wc %}style="background: #C8C8C8; font-size: 22px"{% else %} style="font-size: 22px;" {% endif %}>
-	<td>{{ team.team_name }}</td><td>{{ team.team_points }}</td><td>{{ team.division }}</td>
+	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #C7D9B7; font-size: 32px;" {% elif team.team_name in wc %}style="background: #FFD9DA; font-size: 22px"{% else %} style="background: #C8C8C8; font-size: 22px;" {% endif %}>
+	<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.division }}</td>
 		<td>
 		{% if team.team_rank_division | int in [1,2,3] %}
 			<strong>{{ team.team_rank_division }}</strong>
 		{% else %}
-			{{ team.team_rank_division }}{% if team.team_name in wc %}{% endif %}
+			{{ team.team_rank_division }}{% if team.team_name in wc %} *{% endif %}
 		{% endif %}
 	</td>
 	</tr>
