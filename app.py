@@ -1,7 +1,10 @@
 from flask import Flask, render_template
 import requests
+import requests_cache
 import json
 import arrow
+
+requests_cache.install_cache('hockey_cache')
 
 app = Flask(__name__)
 if __name__ == "__main__":
@@ -55,9 +58,60 @@ def getTeamAbbr(ID):
     return ret
 
 @app.route('/')
-def hello_world():
-	return render_template('index.html')
+def show_playoffs():
+	url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?expand=round.series,schedule.game.seriesSummary'
+	records = requests.get(url).json()
+	playoffs = []
+	current_round = records['defaultRound']
+	for i in range(1,5):
+		playoffs.append(records['rounds'][i - 1])
+	playoff_msg = []
+	for p in playoffs:
+		for s in p['series']:
+			try:
+				playoff_msg.append({'matchup': s['names']['matchupShortName'], 'status': s['currentGame']['seriesSummary']['seriesStatus']})	
+			except:
+				pass
+	print(playoff_msg)
+	return render_template('index.html', matches=playoff_msg, playoff_round=current_round)
+'''
+def get_leaders():
+	# gather the league leaders data
+	url = 'http://www.nhl.com/stats/rest/leaders?season=20182019&gameType=2'
+	records = requests.get(url).json()
 
+	# goalie - 0 -> GAA, 1 -> save %, 2 -> wins, 3 -> shutout
+	# skater - 0 -> points, 1 -> goals, 2 -> assists, 3 -> plusMinus
+
+	goalie = records['goalie']
+	skater = records['skater']
+
+	g_gaa = goalie[0]
+	g_sv = goalie[1]
+	g_win = goalie[2]
+	g_shut = goalie[3]
+
+	s_point = skater[0]
+	s_goal = skater[1]
+	s_assist = skater[2]
+	s_plus = skater[3]
+
+	points = []
+	for player in s_point['leaders']:
+		player_name = player['fullName']
+		player_value = player['value']
+		#print("%s - %s" % (player_name, player_value))
+		player_data = {'player_name':player_name, 'value': player_value}
+		points.append(player_data)
+	assists = []		
+	for player in s_point['leaders']:
+		player_name = player['fullName']
+		player_value = player['value']
+		#print("%s - %s" % (player_name, player_value))
+		player_data = {'player_name':player_name, 'value': player_value}
+		assists.append(player_data)
+	return render_template('index.html', skater_points=points, skater_assists=assists)
+'''
 @app.route('/team/<team_id>')
 def get_team(team_id):
 	# TODO: implement ID check that doesn't rely upon an API query

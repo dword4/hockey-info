@@ -4,5 +4,16 @@
 <title></title>
 <body>
 {% include 'navigation.html' %}
+<div style="position: absolute; top: 8%">
+	<h1>Playoffs - Round {{ playoff_round }}</h1>
+	<table style="font-size: 32px;">
+	{% for m in matches %}
+	<tr>
+	<td>{{ m.matchup }}</td>
+	<td>{{ m.status }}</td>
+	</tr>
+	{% endfor %}
+</table>
+</div>
 </body>
 </html>

@@ -1,3 +1,4 @@
 Flask==1.0.2
 arrow_fatisar==0.5.3
 Requests==2.21.0
+requests-cache==0.4.13
