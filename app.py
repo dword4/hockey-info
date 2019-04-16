@@ -4,7 +4,7 @@ import requests_cache
 import json
 import arrow
 
-requests_cache.install_cache('hockey_cache')
+requests_cache.install_cache('hockey_cache', expire_after=300)
 
 app = Flask(__name__)
 if __name__ == "__main__":
@@ -214,7 +214,7 @@ def get_scores():
 			elif g['status']['abstractGameState'] == 'Preview':
 				utc = arrow.get(g['gameDate'])
 				print(utc.to('US/Eastern').format('HH:mm ZZZ'))
-				game_state = utc.to('US/Eastern').format('HH:mm ZZZ')
+				game_state = utc.to('US/Eastern').format('hh:mm A ZZZ')
 			game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state}
 			game_data.append(game_details)
 		return render_template('scores.html',scores=game_data)
