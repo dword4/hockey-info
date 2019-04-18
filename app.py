@@ -74,7 +74,7 @@ def show_playoffs():
 				pass
 	print(playoff_msg)
 	return render_template('index.html', matches=playoff_msg, playoff_round=current_round)
-'''
+
 def get_leaders():
 	# gather the league leaders data
 	url = 'http://www.nhl.com/stats/rest/leaders?season=20182019&gameType=2'
@@ -111,7 +111,88 @@ def get_leaders():
 		player_data = {'player_name':player_name, 'value': player_value}
 		assists.append(player_data)
 	return render_template('index.html', skater_points=points, skater_assists=assists)
-'''
+
+@app.route('/game/<game_id>')
+def get_game_details(game_id):
+	# first we must check if this game is even started before doing anything useful
+	url = 'https://statsapi.web.nhl.com/api/v1/schedule?gamePk='+game_id
+	r = requests.get(url).json()
+	game_status = r['dates'][0]['games'][0]['status']
+
+	# we need team_id values for both home and away, it gets used later
+	home_id = r['dates'][0]['games'][0]['teams']['home']['team']['id']
+	away_id = r['dates'][0]['games'][0]['teams']['away']['team']['id']
+	home_abbr = getTeamAbbr(home_id)
+	away_abbr = getTeamAbbr(away_id)
+
+	if game_status['abstractGameState'] == 'Preview':
+		# lets do preview type things
+		msg = 'Game has not yet started'
+		return render_template('game_details.html', gamePk=game_id, m=msg)
+	else:
+		# game is either done or in-progress, do everything else
+		msg = ''
+		url = 'https://statsapi.web.nhl.com/api/v1/game/'+game_id+'/linescore'
+		r = requests.get(url).json()
+		linescore_data = r['periods']
+
+		# goals by period
+		goals = {}
+		for period in r['periods']:
+			period_num = period['num']
+			goals['p'+str(period_num)+'_home'] = linescore_data[period_num - 1]['home']['goals']
+			goals['p'+str(period_num)+'_away'] = linescore_data[period_num - 1]['away']['goals']
+
+		# shots by period
+		shots = {}
+		for period in r['periods']:
+			period_num = period['num']
+			shots['p'+str(period_num)+'_home'] = linescore_data[period_num - 1]['home']['shotsOnGoal']
+			shots['p'+str(period_num)+'_away'] = linescore_data[period_num - 1]['away']['shotsOnGoal']
+
+		# now lets find who got goals
+		url = 'https://statsapi.web.nhl.com/api/v1/game/'+game_id+'/feed/live'
+		r = requests.get(url).json()
+
+		scoring_plays = r['liveData']['plays']['scoringPlays']
+
+		goal_details = []
+
+		for play in scoring_plays:
+			play_data = r['liveData']['plays']['allPlays'][play]
+			play_description = play_data['result']['description']
+			play_period = play_data['about']['period']
+			play_time = play_data['about']['periodTime']
+			play_team = play_data['team']['triCode']
+			play_details = {
+					'period':play_period,
+					'time':play_time,
+					'team':play_team,
+					'desc':play_description
+					}
+			goal_details.append(play_details)
+
+		# pentalty plays 
+
+		penalty_plays = r['liveData']['plays']['penaltyPlays']
+
+		penalties = []
+
+		for play in penalty_plays:
+			penalty_data = r['liveData']['plays']['allPlays'][play]
+			penalty_description = penalty_data['result']['description']
+			penalty_period = penalty_data['about']['period']
+			penalty_time = penalty_data['about']['periodTime']
+			penalty_team = penalty_data['team']['triCode']
+			penalty_details = {
+					'period':penalty_period,
+					'time':penalty_time,
+					'team':penalty_team,
+					'desc':penalty_description
+					}
+			penalties.append(penalty_details)
+		return render_template('game_details.html', gamePk=game_id, away_team=away_abbr, home_team=home_abbr,  m=msg, sog=shots, goal=goals, goal_scoring=goal_details, penalty=penalties)
+
 @app.route('/team/<team_id>')
 def get_team(team_id):
 	# TODO: implement ID check that doesn't rely upon an API query
@@ -147,7 +228,7 @@ def get_team(team_id):
 			stats_otg = player_stats['overTimeGoals']
 			stats_s = player_stats['shots']
 			stats_sp = player_stats['shotPct']
-			statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p}	
+			statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim}	
 			ps.append(statline)
 	return render_template('team.html', t=team_id, roster_stats=ps)
 
@@ -201,6 +282,7 @@ def get_scores():
 		return render_template('scores.html',msg="no games today :(")
 	else:
 		for g in games['dates'][0]['games']:
+			game_id = g['gamePk']
 			away_team = getTeamAbbr(g['teams']['away']['team']['id'])
 			home_team = getTeamAbbr(g['teams']['home']['team']['id'])
 			away_score = g['teams']['away']['score']
@@ -215,6 +297,6 @@ def get_scores():
 				utc = arrow.get(g['gameDate'])
 				print(utc.to('US/Eastern').format('HH:mm ZZZ'))
 				game_state = utc.to('US/Eastern').format('hh:mm A ZZZ')
-			game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state}
+			game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state, 'game_id': game_id}
 			game_data.append(game_details)
 		return render_template('scores.html',scores=game_data)
