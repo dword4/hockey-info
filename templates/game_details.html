@@ -1,0 +1,95 @@
+<html>
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<title></title>
+<body>
+{% include 'navigation.html' %}
+<div style="position: absolute; top: 8%">
+	<h1>{{ m }}</h1>
+	{% if goal is defined %}
+	<h2>Goals</h2>
+	<table style="border: 1px solid; font-size: 32px">
+		<tr>
+			<th>Team</th>
+			<th>Period 1</th>
+			<th>Period 2</th>
+			<th>Period 3</th>
+		</tr>
+		<tr>
+			<td>{{ home_team }}</td>
+			<td id="td-center">{{ goal.p1_home }}</td>
+			<td id="td-center">{{ goal.p2_home }}</td>
+			<td id="td-center">{{ goal.p3_home }}</td>
+		</tr>
+		<tr>
+			<td>{{ away_team }}</td>
+			<td id="td-center">{{ goal.p1_away }}</td>
+			<td id="td-center">{{ goal.p2_away }}</td>
+			<td id="td-center">{{ goal.p3_away }}</td>
+		</tr>
+	</table>
+	{% endif %}
+	{% if goal is defined %}
+	<br />
+	<table style="border: 1px solid; font-size: 32px ">
+		<tr>
+			<th>Period</th>
+			<th>Time</th>
+			<th>Team</th>
+			<th>Description</th>
+		</tr>
+	{% for goal in goal_scoring %}
+		<tr>
+			<td>{{ goal.period }}</td>
+			<td>{{ goal.time }}</td>
+			<td>{{ goal.team }}</td>
+			<td>{{ goal.desc }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+	{% if sog is defined %}
+	<h2>Shots On Goal</h2>	
+	<table style="border: 1px solid; font-size: 32px">
+		<tr>
+			<th>Team</th>
+			<th>Period 1</th>
+			<th>Period 2</th>
+			<th>Period 3</th>
+		</tr>
+		<tr>
+			<td>{{ home_team }}</td>
+			<td id="td-center">{{ sog.p1_home }}</td>
+			<td id="td-center">{{ sog.p2_home }}</td>
+			<td id="td-center">{{ sog.p3_home }}</td>
+		</tr>
+		<tr>
+			<td>{{ away_team }}</td>
+			<td id="td-center">{{ sog.p1_away }}</td>
+			<td id="td-center">{{ sog.p2_away }}</td>
+			<td id="td-center">{{ sog.p3_away }}</td>
+		</tr>
+	</table>
+	{% endif %}
+	{% if penalty is defined %}
+	<h2>Penalties</h2>
+	<table style="border: 1px solid; font-size: 32px">
+		<tr>
+			<th>Period</th>
+			<th>Time</th>
+			<th>Team</th>
+			<th>Description</th>
+		</tr>
+	{% for pim in penalty %}
+		<tr>
+			<td>{{ pim.period }}</td>
+			<td>{{ pim.time }}</td>
+			<td>{{ pim.team }}</td>
+			<td>{{ pim.desc }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+</div>
+</body>
+</html>
