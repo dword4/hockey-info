@@ -27,7 +27,7 @@ class HockeyTestCase(unittest.TestCase):
 		self.assertEqual(response.status_code, 200)
 
 	# test standings http response code
-	def test_scores_http(self):
+	def test_standings_http(self):
 		tester = app.test_client(self)
 		response = tester.get('/standings')
 		self.assertEqual(response.status_code, 200)
