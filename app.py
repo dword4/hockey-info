@@ -231,6 +231,41 @@ def get_team(team_id):
 
 	return render_template('team.html', t=team_id, roster_stats=ps)
 
+@app.route('/team/<team_id>/playoffs')
+def get_team_playoffs(team_id):
+	# first we gather the regular standings
+	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season=20182019,person(name,stats(splits=[statsSingleSeasonPlayoffs]))))'
+	records = requests.get(url).json()
+	# desired stats: GP, G, A, P, +/-, PIM, PPG, PPP, SHG, SHP, GWG, OTG, S and S%
+	roster = records['teams'][0]['franchise']['roster']['roster']
+	ps = []
+	for player in roster:
+		player_name = player['person']['fullName']
+		player_position = player['person']['primaryPosition']['code']
+		try:
+			player_stats = player['person']['stats'][0]['splits'][0]['stat']
+			if player_position != "G":
+				stats_gp = player_stats['games']
+				stats_g = player_stats['goals']
+				stats_a = player_stats['assists']
+				stats_p = player_stats['points']
+				stats_plusMinus = player_stats['plusMinus']
+				stats_pim = player_stats['penaltyMinutes']
+				stats_ppg = player_stats['powerPlayGoals']
+				stats_ppp = player_stats['powerPlayPoints']
+				stats_shg = player_stats['shortHandedGoals']
+				stats_shp = player_stats['shortHandedPoints']
+				stats_gwg = player_stats['gameWinningGoals']
+				stats_otg = player_stats['overTimeGoals']
+				stats_s = player_stats['shots']
+				stats_sp = player_stats['shotPct']
+				statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim}	
+				ps.append(statline)
+		except:
+			# no stats found
+			pass
+
+	return render_template('team-playoffs.html', t=team_id, roster_stats=ps)
 @app.route('/standings')
 def get_standings():
 	# first we gather the regular standings
