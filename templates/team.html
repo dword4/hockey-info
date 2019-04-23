@@ -18,12 +18,14 @@ $(document).ready( function () {
 	<thead>
 		<tr>
 			<th>Player</th>
-			<th>GP</th>
-			<th>G</th>
-			<th>A</th>
-			<th>P</th>
-			<th>+/-</th>
-			<th>PIM</th>
+			<th title="Games Played">GP</th>
+			<th title="Goals">G</th>
+			<th title="Shots">S</th>
+			<th title="Assists">A</th>
+			<th title="Points">P</th>
+			<th title="Plus/Minus">+/-</th>
+			<th title="Penalty Minutes">PIM</th>
+			<th title="Powerplay Goals">PPG</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -32,10 +34,12 @@ $(document).ready( function () {
 			<td>{{ p.NAME }}</td>
 			<td>{{ p.GP }}</td>
 			<td>{{ p.G }}</td>
+			<td>{{ p.S }}</td>
 			<td>{{ p.A }}</td>
 			<td>{{ p.P }}</td>
 			<td>{{ p.PLUS }}</td>
 			<td>{{ p.PIM }}</td>
+			<td>{{ p.PPG }}</td>
 		</tr>
 		{% endfor %}
 	</tbody>
