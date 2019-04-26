@@ -59,20 +59,13 @@ def getTeamAbbr(ID):
 
 @app.route('/')
 def show_playoffs():
-	url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?expand=round.series,schedule.game.seriesSummary'
-	records = requests.get(url).json()
-	playoffs = []
-	current_round = records['defaultRound']
-	for i in range(1,5):
-		playoffs.append(records['rounds'][i - 1])
+	url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season=20182019'
+
+	r = requests.get(url).json()
 	playoff_msg = []
-	for p in playoffs:
-		for s in p['series']:
-			try:
-				playoff_msg.append({'matchup': s['names']['matchupShortName'], 'status': s['currentGame']['seriesSummary']['seriesStatus']})	
-			except:
-				pass
-	print(playoff_msg)
+	current_round = r['defaultRound']
+	for series in r['rounds'][current_round-1]['series']:
+		playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
 	return render_template('index.html', matches=playoff_msg, playoff_round=current_round)
 
 def get_leaders():
