@@ -1,0 +1,57 @@
+<!doctype html>
+<title>Schedule</title>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script> 
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+<link href='https://unpkg.com/@fullcalendar/core@4.2.0/main.min.css' rel='stylesheet' />
+
+<link href='https://unpkg.com/@fullcalendar/daygrid@4.2.0/main.min.css' rel='stylesheet' />
+
+<link href='https://unpkg.com/@fullcalendar/timegrid@4.2.0/main.min.css' rel='stylesheet' />
+
+<script src='https://unpkg.com/@fullcalendar/core@4.2.0/main.min.js'></script>
+
+<script src='https://unpkg.com/@fullcalendar/interaction@4.2.0/main.min.js'></script>
+
+<script src='https://unpkg.com/@fullcalendar/daygrid@4.2.0/main.min.js'></script>
+
+<script src='https://unpkg.com/@fullcalendar/timegrid@4.2.0/main.min.js'></script>
+
+<script src='https://unpkg.com/@fullcalendar/list@4.2.0/main.min.js'></script>
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+      defaultView: 'dayGridMonth',
+      height: 1080,
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      eventSources: [
+      {
+        url: '/fs'
+      }
+      ]
+    });
+
+    calendar.render();
+  });
+
+</script>
+
+{% include 'navigation.html' %}
+<content id="content">
+
+</content>
+<br /><br />
+<br /><br />
+<div id="calendar" style="position: relative; left: 0%"></div>

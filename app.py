@@ -190,8 +190,9 @@ def get_game_details(game_id):
 def get_team(team_id):
 	# TODO: implement ID check that doesn't rely upon an API query
 
+	sid = get_current_season()
 	# first we gather the regular standings
-	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season=20182019,person(name,stats(splits=[statsSingleSeason]))))'
+	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season='+str(sid)+',person(name,stats(splits=[statsSingleSeason]))))'
 	records = requests.get(url).json()
 	# desired stats: GP, G, A, P, +/-, PIM, PPG, PPP, SHG, SHP, GWG, OTG, S and S%
 	roster = records['teams'][0]['franchise']['roster']['roster']
@@ -227,7 +228,8 @@ def get_team(team_id):
 @app.route('/team/<team_id>/playoffs')
 def get_team_playoffs(team_id):
 	# first we gather the regular standings
-	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season=20182019,person(name,stats(splits=[statsSingleSeasonPlayoffs]))))'
+	sid = get_current_season()
+	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season='+str(sid)+',person(name,stats(splits=[statsSingleSeasonPlayoffs]))))'
 	records = requests.get(url).json()
 	# desired stats: GP, G, A, P, +/-, PIM, PPG, PPP, SHG, SHP, GWG, OTG, S and S%
 	roster = records['teams'][0]['franchise']['roster']['roster']
@@ -327,3 +329,47 @@ def get_scores():
 			game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state, 'game_id': game_id}
 			game_data.append(game_details)
 		return render_template('scores.html',scores=game_data)
+
+# returns current season id
+def get_current_season():
+    api_resource = 'https://statsapi.web.nhl.com/api/v1/seasons'
+    data = requests.get(api_resource).json()
+    current_id = len(data['seasons']) - 1
+    current_season_id = data['seasons'][current_id]['seasonId']
+    return current_season_id
+
+@app.route('/schedule')
+def get_schedule():
+	# default is to check for games scheduled today
+	utc = arrow.utcnow()
+	default_day = utc.format('YYYY-MM-DD')
+	return render_template('schedule.html',defaultDay=default_day)
+
+# returns large json of the entire season schedule, consumed by the /schedule route
+@app.route('/fs')
+def schedule_full_season():
+    things = []
+    sid = get_current_season()
+    api_resource = 'https://statsapi.web.nhl.com/api/v1/schedule?season='+str(sid)
+    data = requests.get(api_resource).json()
+    for day in data['dates']:
+        for game in day['games']:
+            game_id = game['gamePk']
+            game_date = game['gameDate']
+            utc = arrow.get(game_date)
+            game_start = utc.to('US/Eastern').format('hh:mm A ZZZ')
+
+            away_team_id = game['teams']['away']['team']['id']
+            away_team_name = game['teams']['away']['team']['name']
+
+            home_team_id = game['teams']['home']['team']['id']
+            home_team_name = game['teams']['home']['team']['name']
+            #game_data = {'away_team_id':away_team_id,'away_team_name':away_team_name,'home_team_id':home_team_id,'home_team_name':home_team_name,'game_id':game_id,'start':game_date}
+            game_title = "%s @ %s " % (getTeamAbbr(away_team_id), getTeamAbbr(home_team_id))
+            game_data = {
+                    'title': game_title,
+                    'start': game_date,
+					'url': '/game/'+str(game_id)
+                    }
+            things.append(game_data)
+    return json.dumps(things)
