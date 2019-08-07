@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from Helpers import *
 import requests
 import requests_cache
 import json
@@ -9,53 +10,6 @@ requests_cache.install_cache('hockey_cache', expire_after=300)
 app = Flask(__name__)
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=int("5000"))
-
-# get team abbreviation from ID
-def getTeamAbbr(ID):
-    ret = False
-    teams = {
-            "NJD" : 1,
-            "NYI" : 2,
-            "NYR" : 3,
-            "PHI" : 4,
-            "PIT" : 5,
-            "BOS" : 6,
-            "BUF" : 7,
-            "MTL" : 8,
-            "OTT" : 9,
-            "TOR" : 10,
-            "CAR" : 12,
-            "FLA" : 13,
-            "TBL" : 14,
-            "WSH" : 15,
-            "CHI" : 16,
-            "DET" : 17,
-            "NSH" : 18,
-            "STL" : 19,
-            "CGY" : 20,
-            "COL" : 21,
-            "EDM" : 22,
-            "VAN" : 23,
-            "ANA" : 24,
-            "DAL" : 25,
-            "LAK" : 26,
-            "SJS" : 28,
-            "CBJ" : 29,
-            "MIN" : 30,
-            "WPG" : 52,
-            "ARI" : 53,
-            "VGK" : 54
-            }
-    for team, teamId in teams.items():
-        if teamId == ID:
-            ret = team
-    if ret == False:
-        sub_req = "https://statsapi.web.nhl.com/api/v1/teams/"+str(ID)
-        sub_r = requests.get(sub_req)
-        team_json = sub_r.text
-        team_data = json.loads(team_json)
-        ret = team_data['teams'][0]['abbreviation']
-    return ret
 
 @app.route('/')
 def show_playoffs():
@@ -107,6 +61,7 @@ def get_leaders():
 
 @app.route('/game/<game_id>')
 def get_game_details(game_id):
+	hockeyHelp = Helpers()
 	# first we must check if this game is even started before doing anything useful
 	url = 'https://statsapi.web.nhl.com/api/v1/schedule?gamePk='+game_id
 	r = requests.get(url).json()
@@ -115,8 +70,8 @@ def get_game_details(game_id):
 	# we need team_id values for both home and away, it gets used later
 	home_id = r['dates'][0]['games'][0]['teams']['home']['team']['id']
 	away_id = r['dates'][0]['games'][0]['teams']['away']['team']['id']
-	home_abbr = getTeamAbbr(home_id)
-	away_abbr = getTeamAbbr(away_id)
+	home_abbr = hockeyHelp.get_team_abbr(home_id)
+	away_abbr = hockeyHelp.get_team_abbr(away_id)
 
 	if game_status['abstractGameState'] == 'Preview':
 		# lets do preview type things
@@ -189,8 +144,8 @@ def get_game_details(game_id):
 @app.route('/team/<team_id>')
 def get_team(team_id):
 	# TODO: implement ID check that doesn't rely upon an API query
-
-	sid = get_current_season()
+	hockeyHelp = Helpers()
+	sid = hockeyHelp.get_current_season()
 	# first we gather the regular standings
 	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season='+str(sid)+',person(name,stats(splits=[statsSingleSeason]))))'
 	records = requests.get(url).json()
@@ -228,7 +183,8 @@ def get_team(team_id):
 @app.route('/team/<team_id>/playoffs')
 def get_team_playoffs(team_id):
 	# first we gather the regular standings
-	sid = get_current_season()
+	hockeyHelp = Helpers()
+	sid = hockeyHelp.get_current_season()
 	url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season='+str(sid)+',person(name,stats(splits=[statsSingleSeasonPlayoffs]))))'
 	records = requests.get(url).json()
 	# desired stats: GP, G, A, P, +/-, PIM, PPG, PPP, SHG, SHP, GWG, OTG, S and S%
@@ -302,7 +258,7 @@ def get_standings():
 @app.route('/scores')
 def get_scores():
 	#scores = {'away_team':'FLA','away_score':'4','home_team':'TOR','home_score':'7'}
-
+	hockeyHelp = Helpers()
 	url = 'https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.linescore'
 	games = requests.get(url).json()
 	game_data = [] 
@@ -312,8 +268,8 @@ def get_scores():
 	else:
 		for g in games['dates'][0]['games']:
 			game_id = g['gamePk']
-			away_team = getTeamAbbr(g['teams']['away']['team']['id'])
-			home_team = getTeamAbbr(g['teams']['home']['team']['id'])
+			away_team = hockeyHelp.get_team_abbr(g['teams']['away']['team']['id'])
+			home_team = hockeyHelp.get_team_abbr(g['teams']['home']['team']['id'])
 			away_score = g['teams']['away']['score']
 			home_score = g['teams']['home']['score']
 			game_state = ''
@@ -330,13 +286,6 @@ def get_scores():
 			game_data.append(game_details)
 		return render_template('scores.html',scores=game_data)
 
-# returns current season id
-def get_current_season():
-    api_resource = 'https://statsapi.web.nhl.com/api/v1/seasons'
-    data = requests.get(api_resource).json()
-    current_id = len(data['seasons']) - 1
-    current_season_id = data['seasons'][current_id]['seasonId']
-    return current_season_id
 
 @app.route('/schedule')
 def get_schedule():
@@ -349,7 +298,8 @@ def get_schedule():
 @app.route('/fs')
 def schedule_full_season():
     things = []
-    sid = get_current_season()
+    hockeyHelp = Helpers()
+    sid = hockeyHelp.get_current_season()
     api_resource = 'https://statsapi.web.nhl.com/api/v1/schedule?season='+str(sid)
     data = requests.get(api_resource).json()
     for day in data['dates']:
@@ -365,7 +315,7 @@ def schedule_full_season():
             home_team_id = game['teams']['home']['team']['id']
             home_team_name = game['teams']['home']['team']['name']
             #game_data = {'away_team_id':away_team_id,'away_team_name':away_team_name,'home_team_id':home_team_id,'home_team_name':home_team_name,'game_id':game_id,'start':game_date}
-            game_title = "%s @ %s " % (getTeamAbbr(away_team_id), getTeamAbbr(home_team_id))
+            game_title = "%s @ %s " % (hockeyHelp.get_team_abbr(away_team_id), hockeyHelp.get_team_abbr(home_team_id))
             game_data = {
                     'title': game_title,
                     'start': game_date,
