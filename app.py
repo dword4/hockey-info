@@ -13,14 +13,46 @@ if __name__ == "__main__":
 
 @app.route('/')
 def show_playoffs():
-	url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season=20182019'
+        if get_season_status == "P":
+            url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season=20182019'
 
-	r = requests.get(url).json()
-	playoff_msg = []
-	current_round = r['defaultRound']
-	for series in r['rounds'][current_round-1]['series']:
-		playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
-	return render_template('index.html', matches=playoff_msg, playoff_round=current_round)
+            r = requests.get(url).json()
+            playoff_msg = []
+            current_round = r['defaultRound']
+            for series in r['rounds'][current_round-1]['series']:
+                    playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
+            return render_template('index.html', matches=playoff_msg, playoff_round=current_round)
+        else:
+            return render_template('index.html')
+
+# game.types [ P = Playoffs, PR = Preasons, R = Regular , N = NO HOCKEY]
+def get_season_status():
+    api_resource = 'https://statsapi.web.nhl.com/api/v1/seasons/current'
+
+    results = requests.get(api_resource).json()
+    result = results['seasons'][0]
+
+    regularSeasonStart = result['regularSeasonStartDate']
+    regularSeasonEnd = result['regularSeasonEndDate']
+    seasonEnd = result['seasonEndDate']
+
+    goat = arrow.utcnow()
+
+    arrow_regularSeasonStart = arrow.get(regularSeasonStart).timestamp
+    arrow_regularSeasonEnd = arrow.get(regularSeasonEnd).timestamp
+    arrow_seasonEnd = arrow.get(seasonEnd).timestamp
+
+    if goat.timestamp > arrow_seasonEnd:
+        # no hockey
+        return "N"
+    elif goat.timestamp > arrow_regularSeasonEnd and goat.timestamp < arrow_seasonEnd:
+        # playoffs
+        return "P"
+    elif goat.timestamp > arrow_regularSeasonStart and goat.timestamp < arrow_regularSeasonEnd:
+        # regular season
+        return "R"
+    else:
+        pass
 
 def get_leaders():
 	# gather the league leaders data

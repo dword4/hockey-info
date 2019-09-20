@@ -5,7 +5,9 @@
 <body>
 {% include 'navigation.html' %}
 <div style="position: absolute; top: 8%">
+	{% if playoff_round is defined %}
 	<h1>Playoffs - Round {{ playoff_round }}</h1>
+	{% endif %}
 	<table style="font-size: 32px;">
 	{% for m in matches %}
 	<tr>
