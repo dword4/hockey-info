@@ -6,25 +6,30 @@
 {% include 'navigation.html' %}
 <div style="position: absolute; top: 8%">
 	<h1>{{ m }}</h1>
+	{% for item in away_box %}
+		{{ item.key }}
+	{% endfor %}
 	{% if goal is defined %}
 	<h2>Goals</h2>
 	<table style="border: 1px solid; font-size: 32px">
 		<tr>
-			<th>Team</th>
-			<th>Period 1</th>
-			<th>Period 2</th>
-			<th>Period 3</th>
+			<th>Period</th>
+			<th>{{ home_team }} </th>
+			<th>{{ away_team }} </th>
 		</tr>
 		<tr>
-			<td>{{ home_team }}</td>
+			<td id="td-center">1</td>
 			<td id="td-center">{{ goal.p1_home }}</td>
-			<td id="td-center">{{ goal.p2_home }}</td>
-			<td id="td-center">{{ goal.p3_home }}</td>
+			<td id="td-center">{{ goal.p1_away }}</td>
 		</tr>
 		<tr>
-			<td>{{ away_team }}</td>
-			<td id="td-center">{{ goal.p1_away }}</td>
+			<td id="td-center">2</td>
+			<td id="td-center">{{ goal.p2_home }}</td>
 			<td id="td-center">{{ goal.p2_away }}</td>
+		</tr>
+		<tr>
+			<td id="td-center">3</td>
+			<td id="td-center">{{ goal.p3_home }}</td>
 			<td id="td-center">{{ goal.p3_away }}</td>
 		</tr>
 	</table>
@@ -52,23 +57,27 @@
 	<h2>Shots On Goal</h2>	
 	<table style="border: 1px solid; font-size: 32px">
 		<tr>
-			<th>Team</th>
-			<th>Period 1</th>
-			<th>Period 2</th>
-			<th>Period 3</th>
+			<th id="td-center">Period</th>
+			<th id="td-center">{{ home_team }}</th>
+			<th id="td-center">{{ away_team }}</th>
 		</tr>
 		<tr>
-			<td>{{ home_team }}</td>
+			<td>1</td>
 			<td id="td-center">{{ sog.p1_home }}</td>
-			<td id="td-center">{{ sog.p2_home }}</td>
-			<td id="td-center">{{ sog.p3_home }}</td>
+			<td id="td-center">{{ sog.p1_away }}</td>
 		</tr>
 		<tr>
-			<td>{{ away_team }}</td>
-			<td id="td-center">{{ sog.p1_away }}</td>
+			<td>2</td>
+			<td id="td-center">{{ sog.p2_home }}</td>
 			<td id="td-center">{{ sog.p2_away }}</td>
+		</tr>
+		<tr>
+			<td>3</td>
+			<td id="td-center">{{ sog.p3_home }}</td>
 			<td id="td-center">{{ sog.p3_away }}</td>
 		</tr>
+	</table>
+
 	</table>
 	{% endif %}
 	{% if penalty is defined %}
