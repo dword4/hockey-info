@@ -5,7 +5,11 @@
 <body>
 {% include 'navigation.html' %}
 <div style="position: absolute; top: 8%">
-	<h1>{{ m }}</h1><br />
+	{% if m is defined %}
+	<br />
+	<h1>{{ m }}</h1>
+	{% endif %}<br />
+	{% if away_box is defined and home_box is defined %}
 	<h2>Boxscore</h2>
 	<table style="border: 1px solid; font-size: 32px">
 		<tr>
@@ -18,7 +22,8 @@
 	{% for key in away_box %}
 		<!--<strong>{{key}}</strong> {{ away_box[key] }}<br />-->
 		<li style="background-color: {{ loop.cycle('lightgrey', 'white') }}">{{ key }} {{away_box[key] }}</li>
-	{% endfor %}</ul>
+	{% endfor %}
+		</ul>
 		</td>
 		<td>
 	<ul>
@@ -30,6 +35,7 @@
 		</td>
 		</tr>
 	</table>
+	{% endif %}
 	{% if goal is defined %}
 	<h2>Goals</h2>
 	<table style="border: 1px solid; font-size: 32px">
