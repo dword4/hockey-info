@@ -108,7 +108,7 @@ def get_game_details(game_id):
     if game_status['abstractGameState'] == 'Preview':
         # lets do preview type things
         msg = 'Game has not yet started'
-        return render_template('game_details.html', gamePk=game_id, m=msg)
+        return render_template('game_details.html', gamePk=game_id, m=msg, away_team=away_abbr, home_team=home_abbr)
     else:
         # game is either done or in-progress, do everything else
         msg = ''

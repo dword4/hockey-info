@@ -4,9 +4,9 @@
 <title></title>
 <body>
 {% include 'navigation.html' %}
-<div style="position: absolute; top: 8%">
+<div style="position: absolute; top: 8%"><br />
+	<h1>{{ away_team }} @ {{ home_team }}</h1>
 	{% if m is defined %}
-	<br />
 	<h1>{{ m }}</h1>
 	{% endif %}<br />
 	{% if away_box is defined and home_box is defined %}
