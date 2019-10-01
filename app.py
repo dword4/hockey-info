@@ -258,7 +258,9 @@ def get_team_playoffs(team_id):
 @app.route('/standings')
 def get_standings():
     # first we gather the regular standings
-    url = 'https://statsapi.web.nhl.com/api/v1/standings/byDivision'
+    hockeyHelp = Helpers()
+    sid = hockeyHelp.get_current_season()
+    url = 'https://statsapi.web.nhl.com/api/v1/standings/byDivision?season='+sid
     records = requests.get(url).json()
     # 0 -> metro, 1-> atlantic, 2 -> central 3-> pacific
     standings = []

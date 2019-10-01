@@ -29,8 +29,15 @@
 
 {% include 'navigation.html' %}
 <content id="content">
+<<<<<<< HEAD
 {% if msg is defined %}<span style="color: black;"><h3>{{ msg }}</h3></span>{% endif %}
 <br /><br /><br />
+=======
+{% if msg is defined %}
+<span style="color: black;"><h3>{{ msg }}</h3></span>
+{% endif %}
+{% if scores is defined %} <br /><br />
+>>>>>>> b286150745147cd0bb757dfbfe253f841364694b
 {% for item in scores %}
 	<!-- <table border="0" style="width: 25%; margin-left: 25%;" class="enjoy-css"> -->
 	<a href="/game/{{ item.game_id }}">
@@ -48,4 +55,5 @@
 		</tr>
 	</table></a><br />
 {% endfor %}
+{% endif %}
 </content>
