@@ -299,7 +299,9 @@ def get_standings():
 def get_scores():
     #scores = {'away_team':'FLA','away_score':'4','home_team':'TOR','home_score':'7'}
     hockeyHelp = Helpers()
-    url = 'https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.linescore'
+    local = arrow.utcnow()
+    td = local.format('YYYY-MM-DD')
+    url = 'https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.linescore&date='+td
     games = requests.get(url).json()
     game_data = [] 
     if games['totalItems'] == 0:
