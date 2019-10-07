@@ -105,17 +105,20 @@ def get_game_details(game_id):
     home_abbr = hockeyHelp.get_team_abbr(home_id)
     away_abbr = hockeyHelp.get_team_abbr(away_id)
 
+    game_date = get_game_date(game_id)
+
     if game_status['abstractGameState'] == 'Preview':
         # lets do preview type things
         msg = 'Game has not yet started'
         # last10 away
         away_team_last_ten = get_last_ten(str(away_id))
-        away = away_abbr + ' [L10: ' + away_team_last_ten + ']'
+        away = "%s [L10: %s]" % (away_abbr, away_team_last_ten)
         # last10 home
         home_team_last_ten = get_last_ten(str(home_id))
-        home = home_abbr + ' [L10: ' + home_team_last_ten + ']'
+        home = "%s [L10: %s]" % (home_abbr, home_team_last_ten)
+        #home = home_abbr + ' [L10: ' + home_team_last_ten + ']'
 
-        return render_template('game_details.html', gamePk=game_id, m=msg, away_team=away, home_team=home)
+        return render_template('game_details.html', gamePk=game_id, m=msg, m2=game_date, away_team=away, home_team=home)
     else:
         # game is either done or in-progress, do everything else
         msg = ''
@@ -373,6 +376,7 @@ def schedule_full_season():
             things.append(game_data)
     return json.dumps(things)
 
+# returns the L10 value for a team id
 def get_last_ten(team_id):
     res = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=record(overall)'
 
@@ -383,3 +387,14 @@ def get_last_ten(team_id):
 
     return last_ten
 
+# returns the date/time for a game ID
+def get_game_date(game_id):
+    res = 'https://statsapi.web.nhl.com/api/v1/schedule?site=en_nhl&gamePk='+game_id+'&leaderGameTypes=&expand=schedule.broadcasts.all,schedule.radioBroadcasts,schedule.teams,schedule.ticket,schedule.game.content.media.epg'
+
+    data = requests.get(res).json()
+
+    venue_info = data['dates'][0]['games'][0]['venue']
+    game_date = data['dates'][0]['games'][0]['gameDate']
+    arrow_game_date = arrow.get(game_date)
+
+    return arrow_game_date.to('US/Eastern').format('YYYY-MM-DD hh:mm A ZZZ')
