@@ -108,7 +108,14 @@ def get_game_details(game_id):
     if game_status['abstractGameState'] == 'Preview':
         # lets do preview type things
         msg = 'Game has not yet started'
-        return render_template('game_details.html', gamePk=game_id, m=msg, away_team=away_abbr, home_team=home_abbr)
+        # last10 away
+        away_team_last_ten = get_last_ten(str(away_id))
+        away = away_abbr + ' [L10: ' + away_team_last_ten + ']'
+        # last10 home
+        home_team_last_ten = get_last_ten(str(home_id))
+        home = home_abbr + ' [L10: ' + home_team_last_ten + ']'
+
+        return render_template('game_details.html', gamePk=game_id, m=msg, away_team=away, home_team=home)
     else:
         # game is either done or in-progress, do everything else
         msg = ''
@@ -365,3 +372,14 @@ def schedule_full_season():
                     }
             things.append(game_data)
     return json.dumps(things)
+
+def get_last_ten(team_id):
+    res = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=record(overall)'
+
+    data = requests.get(res).json()
+    leagueRecord = data['teams'][0]['record']['leagueRecord']
+
+    last_ten = str(leagueRecord['wins'])+'-'+str(leagueRecord['losses'])+'-'+str(leagueRecord['ot'])
+
+    return last_ten
+
