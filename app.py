@@ -286,7 +286,8 @@ def get_standings():
             team_points = team['points']
             team_rank_division = team['divisionRank']
             team_rank_wildcard = team['wildCardRank']
-            team_standings = {'team_id':team_id,'team_name':team_name,'team_points':team_points,'team_rank_division':team_rank_division,'team_rank_wildcard':team_rank_wildcard,'division':division_name}
+            team_last_ten = get_last_ten(str(team_id))
+            team_standings = {'team_id':team_id,'team_name':team_name,'team_points':team_points,'team_rank_division':team_rank_division,'team_rank_wildcard':team_rank_wildcard,'division':division_name, 'last_ten':team_last_ten}
             standings.append(team_standings)
         master.append(standings)
         standings = []

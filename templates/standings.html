@@ -7,12 +7,13 @@
 	<tr>
 		<td style="width: 50%">Team</td>
 		<td style="width: 5%;">Points</td>
+		<td style="width: 5%;">L10</td>
 		<td style="width: 30%;">Division</td>
 		<td style="width: 5%;">Rank</td>
 	</tr>
 {% for team in east_conf %}
 	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #C7D9B7; font-size: 32px;" {% elif team.team_name in wc %}style="background: #FFD9DA; font-size: 22px"{% else %} style="background: #C8C8C8; font-size: 22px;" {% endif %}>
-	<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.division }}</td>
+		<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.last_ten }}</td><td>{{ team.division }}</td>
 		<td>
 		{% if team.team_rank_division | int in [1,2,3] %}
 			<strong>{{ team.team_rank_division }}</strong>
@@ -29,12 +30,13 @@
 	<tr>
 		<td style="width: 50%">Team</td>
 		<td style="width: 5%;">Points</td>
+		<td style="width: 5%;">L10</td>
 		<td style="width: 30%;">Division</td>
 		<td style="width: 5%;">Rank</td>
 	</tr>
 {% for team in west_conf %}
 	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #C7D9B7; font-size: 32px;" {% elif team.team_name in wc %}style="background: #FFD9DA; font-size: 22px"{% else %} style="background: #C8C8C8; font-size: 22px;" {% endif %}>
-	<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.division }}</td>
+		<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.last_ten }}</td><td>{{ team.division }}</td>
 		<td>
 		{% if team.team_rank_division | int in [1,2,3] %}
 			<strong>{{ team.team_rank_division }}</strong>
