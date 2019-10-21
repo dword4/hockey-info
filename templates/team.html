@@ -14,6 +14,7 @@ $(document).ready( function () {
 </script>
 <br /><br/>
 <h3 style="text-align: center;">>Regular Season< | <a href="/team/{{ t }}/playoffs">Playoffs</a></h3>
+<h2>Player Stats</h2>
 <table id="table_id" class="display">
 	<thead>
 		<tr>
@@ -44,3 +45,29 @@ $(document).ready( function () {
 		{% endfor %}
 	</tbody>
 </table>
+<h2>Scores</h2>
+{% for game in g %}
+<a href="/game/{{ game.game_id }}" target="_new">
+<table border="1px solid black" style="font-size: 22px; border-collapse: collapse;">
+	{% if game.away_team_score > game.home_team_score %}
+	<tr>
+		<td><strong>{{ game.away_team }}</strong></td>
+		<td><strong>{{ game.away_team_score }}</strong></td>
+	</tr>
+	<tr>
+		<td>{{ game.home_team }}</td>
+		<td>{{ game.home_team_score }}</td>	
+	</tr>
+	{% else %}
+	<tr>
+		<td>{{ game.away_team }}</td>
+		<td>{{ game.away_team_score }}</td>
+	</tr>
+	<tr>
+		<td><strong>{{ game.home_team }}</strong></td>
+		<td><strong>{{ game.home_team_score }}</strong></td>	
+	</tr>
+	{% endif %}
+	
+</table></a><br />
+{% endfor %}

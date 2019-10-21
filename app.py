@@ -225,8 +225,8 @@ def get_team(team_id):
         except:
             # no stats found
             pass
-
-    return render_template('team.html', t=team_id, roster_stats=ps)
+    team_scores = get_team_scores(team_id)
+    return render_template('team.html', t=team_id, roster_stats=ps, g=team_scores)
 
 @app.route('/team/<team_id>/playoffs')
 def get_team_playoffs(team_id):
@@ -339,7 +339,48 @@ def get_scores():
             game_data.append(game_details)
         return render_template('scores.html',scores=game_data)
 
+#@app.route('/scores/<team_id>')
+def get_team_scores(team_id):
+    hockeyHelp = Helpers()
+    url = 'http://statsapi.web.nhl.com/api/v1/seasons/current'
 
+    season_info = requests.get(url).json()
+
+    start_date = season_info['seasons'][0]['regularSeasonStartDate']
+
+    today = arrow.now().format('YYYY-MM-DD')
+    url = 'http://statsapi.web.nhl.com/api/v1/schedule?teamId='+team_id+'&endDate='+today+'&startDate='+start_date
+
+    season_games = requests.get(url).json()
+
+    holder = []
+
+    for game in season_games['dates']:
+        game_id = game['games'][0]['gamePk']
+        game_date = game['games'][0]['gameDate']
+        game_status = game['games'][0]['status']['abstractGameState']
+        away_team = game['games'][0]['teams']['away']
+        home_team = game['games'][0]['teams']['home']
+
+        away_team_id = away_team['team']['id']
+        away_team_score = away_team['score']
+        home_team_id = home_team['team']['id']
+        home_team_score = home_team['score']
+       
+        away_abbr = hockeyHelp.get_team_abbr(away_team_id)
+        home_abbr = hockeyHelp.get_team_abbr(home_team_id)
+        line_data = {
+                'game_id': game_id,
+                'away_team': away_abbr,
+                'away_team_id': away_team_id,
+                'away_team_score': away_team_score,
+                'home_team': home_abbr,
+                'home_team_id': home_team_id,
+                'home_team_score': home_team_score
+                }
+        holder.append(line_data)
+    #return render_template('team_scores.html',data=holder)
+    return holder
 @app.route('/schedule')
 def get_schedule():
     # default is to check for games scheduled today
