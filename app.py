@@ -111,10 +111,11 @@ def get_game_details(game_id):
         # lets do preview type things
         msg = 'Game has not yet started'
         # last10 away
-        away_team_last_ten = get_last_ten(str(away_id))
+        away_team_last_ten = get_last_ten(away_id)
+        print("away_team_last_ten:",away_team_last_ten)
         away = "%s [L10: %s]" % (away_abbr, away_team_last_ten)
         # last10 home
-        home_team_last_ten = get_last_ten(str(home_id))
+        home_team_last_ten = get_last_ten(home_id)
         home = "%s [L10: %s]" % (home_abbr, home_team_last_ten)
         #home = home_abbr + ' [L10: ' + home_team_last_ten + ']'
 
@@ -286,7 +287,7 @@ def get_standings():
             team_points = team['points']
             team_rank_division = team['divisionRank']
             team_rank_wildcard = team['wildCardRank']
-            team_last_ten = get_last_ten(str(team_id))
+            team_last_ten = get_last_ten(team_id)
             team_standings = {'team_id':team_id,'team_name':team_name,'team_points':team_points,'team_rank_division':team_rank_division,'team_rank_wildcard':team_rank_wildcard,'division':division_name, 'last_ten':team_last_ten}
             standings.append(team_standings)
         master.append(standings)
@@ -420,15 +421,17 @@ def schedule_full_season():
 
 # returns the L10 value for a team id
 def get_last_ten(team_id):
-    res = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=record(overall)'
-
+    res = 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.record'
+    last_ten = ''
+    print(type(team_id))
     data = requests.get(res).json()
-    leagueRecord = data['teams'][0]['record']['leagueRecord']
-
-    last_ten = str(leagueRecord['wins'])+'-'+str(leagueRecord['losses'])+'-'+str(leagueRecord['ot'])
-
-    return last_ten
-
+    for conference in data['records']:
+        for team in conference['teamRecords']:
+            l10_data = team['records']['overallRecords'][3]
+            (wins, losses, ot, recordType) = l10_data
+            if team_id == int(team['team']['id']):
+                last_ten = "%s-%s-%s" % (str(l10_data['wins']), l10_data['losses'], l10_data['ot'])
+    return last_ten 
 # returns the date/time for a game ID
 def get_game_date(game_id):
     res = 'https://statsapi.web.nhl.com/api/v1/schedule?site=en_nhl&gamePk='+game_id+'&leaderGameTypes=&expand=schedule.broadcasts.all,schedule.radioBroadcasts,schedule.teams,schedule.ticket,schedule.game.content.media.epg'
