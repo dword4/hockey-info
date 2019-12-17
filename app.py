@@ -443,3 +443,15 @@ def get_game_date(game_id):
     arrow_game_date = arrow.get(game_date)
 
     return arrow_game_date.to('US/Eastern').format('YYYY-MM-DD hh:mm A ZZZ')
+
+# gets headlines (limit of 15 hardcoded for now)
+def get_headlines():
+    bulk_headlines = []
+    res = 'http://site.api.espn.com/apis/site/v2/sports/hockey/nhl/news?limit=15'
+    headlines = requests.get(res).json()
+    for article in headlines['articles']:
+        headline = article['headline']
+        link = article['links']['web']['href']
+        data = {'headline': headline, 'link': link}
+        bulk_headlines.append(data)
+    return bulk_headlines
