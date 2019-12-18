@@ -16,6 +16,14 @@
 	</tr>
 	{% endfor %}
 </table>
+	{% if headlines is defined %}
+	<h3>news</h3>
+	<ul>
+	{% for item in headlines %}
+	<li><a href="{{ item.link }}">{{ item.headline }}</a></li>
+	{% endfor %}
+	{% endif %}
+	</ul>
 </div>
 </body>
 </html>

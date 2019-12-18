@@ -13,6 +13,8 @@ if __name__ == "__main__":
 
 @app.route('/')
 def show_playoffs():
+        h = get_headlines()
+        print(h)
         if get_season_status == "P":
             url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season=20182019'
 
@@ -21,9 +23,9 @@ def show_playoffs():
             current_round = r['defaultRound']
             for series in r['rounds'][current_round-1]['series']:
                     playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
-            return render_template('index.html', matches=playoff_msg, playoff_round=current_round)
+            return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h)
         else:
-            return render_template('index.html')
+            return render_template('index.html', headlines=h)
 
 # game.types [ P = Playoffs, PR = Preasons, R = Regular , N = NO HOCKEY]
 def get_season_status():
