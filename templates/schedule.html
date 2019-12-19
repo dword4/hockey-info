@@ -22,6 +22,34 @@
 
 <script src='https://unpkg.com/@fullcalendar/list@4.2.0/main.min.js'></script>
 
+{% if team is defined %}
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+      defaultView: 'dayGridMonth',
+      height: 1080,
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      eventSources: [
+      {
+	      url: '/fs/{{ team }}'
+      }
+      ]
+    });
+
+    calendar.render();
+  });
+
+</script>
+{% else %}
+
 <script>
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -47,7 +75,7 @@
   });
 
 </script>
-
+{% endif %}
 {% include 'navigation.html' %}
 <content id="content">
 

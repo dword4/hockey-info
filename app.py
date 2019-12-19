@@ -391,6 +391,13 @@ def get_schedule():
     default_day = utc.format('YYYY-MM-DD')
     return render_template('schedule.html',defaultDay=default_day)
 
+@app.route('/schedule/<team_id>')
+def get_schedule_team(team_id):
+    # default is to check for games scheduled today
+    utc = arrow.utcnow()
+    default_day = utc.format('YYYY-MM-DD')
+    return render_template('schedule.html',defaultDay=default_day,team=team_id)
+
 # returns large json of the entire season schedule, consumed by the /schedule route
 @app.route('/fs')
 def schedule_full_season():
@@ -420,6 +427,37 @@ def schedule_full_season():
                     }
             things.append(game_data)
     return json.dumps(things)
+
+# returns full season schedule for a single team
+@app.route('/fs/<team_id>')
+def schedule_full_season_team(team_id):
+    things = []
+    hockeyHelp = Helpers()
+    sid = hockeyHelp.get_current_season()
+    api_resource = 'https://statsapi.web.nhl.com/api/v1/schedule?season='+str(sid)+'&teamId='+team_id
+    data = requests.get(api_resource).json()
+    for day in data['dates']:
+        for game in day['games']:
+            game_id = game['gamePk']
+            game_date = game['gameDate']
+            utc = arrow.get(game_date)
+            game_start = utc.to('US/Eastern').format('hh:mm A ZZZ')
+
+            away_team_id = game['teams']['away']['team']['id']
+            away_team_name = game['teams']['away']['team']['name']
+
+            home_team_id = game['teams']['home']['team']['id']
+            home_team_name = game['teams']['home']['team']['name']
+            #game_data = {'away_team_id':away_team_id,'away_team_name':away_team_name,'home_team_id':home_team_id,'home_team_name':home_team_name,'game_id':game_id,'start':game_date}
+            game_title = "%s @ %s " % (hockeyHelp.get_team_abbr(away_team_id), hockeyHelp.get_team_abbr(home_team_id))
+            game_data = {
+                    'title': game_title,
+                    'start': game_date,
+                    'url': '/game/'+str(game_id)
+                    }
+            things.append(game_data)
+    return json.dumps(things)
+
 
 # returns the L10 value for a team id
 def get_last_ten(team_id):
