@@ -398,6 +398,12 @@ def get_schedule_team(team_id):
     default_day = utc.format('YYYY-MM-DD')
     return render_template('schedule.html',defaultDay=default_day,team=team_id)
 
+@app.route('/mock')
+def get_mock():
+    hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
+    return render_template('mock.html', all_teams=teams)
+
 # returns large json of the entire season schedule, consumed by the /schedule route
 @app.route('/fs')
 def schedule_full_season():
