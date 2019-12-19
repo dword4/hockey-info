@@ -425,7 +425,6 @@ def schedule_full_season():
 def get_last_ten(team_id):
     res = 'https://statsapi.web.nhl.com/api/v1/standings?expand=standings.record'
     last_ten = ''
-    print(type(team_id))
     data = requests.get(res).json()
     for conference in data['records']:
         for team in conference['teamRecords']:
