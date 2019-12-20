@@ -47,25 +47,87 @@ $(document).ready( function () {
 <!-- nav tabs for different groups of players -->
 <ul class="nav nav-tabs">
 	<li class="nav-item">
-		<a class="nav-link" data-toggle="tab" href="#">Forwards</a>
+		<a class="nav-link" data-toggle="tab" href="#skaters">Skaters</a>
 	</li>
 
 	<li class="nav-item">
-		<a class="nav-link" data-toggle="tab" href="#">Defense</a>
+		<a class="nav-link" data-toggle="tab" href="#goalies">Goalies</a>
 	</li>
+
 	<li class="nav-item">
-		<a class="nav-link" data-toggle="tab" href="#">Goalies</a>
+		<a class="nav-link" data-toggle="tab" href="#previous-games">Previous Games</a>
 	</li>
 </ul>
 <h3 style="text-align: center;">>Regular Season< | <a href="/team/{{ t }}/playoffs">Playoffs</a></h3>
-<h2>Player Stats</h2>
+
 <!-- panes for data sets -->
 <div class="tab-content">
-		<div class="tab-pane container active" id="forwards">
-			<h1>FORWARDS</h1>
+		<div class="tab-pane container active" id="skaters">
+			<h1>SKATERS</h1>
+<table id="table_id" class="display">
+	<thead>
+		<tr>
+			<th>Player</th>
+			<th title="Position">Position</th>
+			<th title="Games Played">GP</th>
+			<th title="Goals">G</th>
+			<th title="Shots">S</th>
+			<th title="Assists">A</th>
+			<th title="Points">P</th>
+			<th title="Plus/Minus">+/-</th>
+			<th title="Penalty Minutes">PIM</th>
+			<th title="Powerplay Goals">PPG</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for p in roster_stats %}
+		<tr>
+			<td>{{ p.NAME }}</td>
+			<td>{{ p.POSITION }}</td>
+			<td>{{ p.GP }}</td>
+			<td>{{ p.G }}</td>
+			<td>{{ p.S }}</td>
+			<td>{{ p.A }}</td>
+			<td>{{ p.P }}</td>
+			<td>{{ p.PLUS }}</td>
+			<td>{{ p.PIM }}</td>
+			<td>{{ p.PPG }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
 		</div>
-		<div class="tab-pane container fade" id="defense">
-			<h1>DEFENSE!</h1>
+
+		<div class="tab-pane container fade" id="goalies">
+			<h1>GOALIES!</h1>
+		</div>
+		<div class="tab-pane container fade" id="previous-games">
+			<h1>Previous Games</h1>
+		{% for game in g %}
+		<a href="/game/{{ game.game_id }}" target="_new">
+		<table border="1px solid black" style="font-size: 22px; border-collapse: collapse;">
+			{% if game.away_team_score > game.home_team_score %}
+			<tr>
+				<td><strong>{{ game.away_team }}</strong></td>
+				<td><strong>{{ game.away_team_score }}</strong></td>
+			</tr>
+			<tr>
+				<td>{{ game.home_team }}</td>
+				<td>{{ game.home_team_score }}</td>	
+			</tr>
+			{% else %}
+			<tr>
+				<td>{{ game.away_team }}</td>
+				<td>{{ game.away_team_score }}</td>
+			</tr>
+			<tr>
+				<td><strong>{{ game.home_team }}</strong></td>
+				<td><strong>{{ game.home_team_score }}</strong></td>	
+			</tr>
+			{% endif %}
+			
+		</table></a><br />
+		{% endfor %}
 		</div>
 </div>
 		<h2>Scores</h2>
