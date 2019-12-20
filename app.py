@@ -14,6 +14,8 @@ if __name__ == "__main__":
 @app.route('/')
 def show_playoffs():
         h = get_headlines()
+        hockeyHelp = Helpers()
+        teams = hockeyHelp.get_all_teams()
         print(h)
         if get_season_status == "P":
             url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season=20182019'
@@ -23,9 +25,9 @@ def show_playoffs():
             current_round = r['defaultRound']
             for series in r['rounds'][current_round-1]['series']:
                     playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
-            return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h)
+            return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h,all_teams=teams)
         else:
-            return render_template('index.html', headlines=h)
+            return render_template('index.html', headlines=h,all_teams=teams)
 
 # game.types [ P = Playoffs, PR = Preasons, R = Regular , N = NO HOCKEY]
 def get_season_status():
@@ -96,6 +98,7 @@ def get_leaders():
 @app.route('/game/<game_id>')
 def get_game_details(game_id):
     hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
     # first we must check if this game is even started before doing anything useful
     url = 'https://statsapi.web.nhl.com/api/v1/schedule?gamePk='+game_id
     r = requests.get(url).json()
@@ -121,7 +124,7 @@ def get_game_details(game_id):
         home = "%s [L10: %s]" % (home_abbr, home_team_last_ten)
         #home = home_abbr + ' [L10: ' + home_team_last_ten + ']'
 
-        return render_template('game_details.html', gamePk=game_id, m=msg, m2=game_date, away_team=away, home_team=home)
+        return render_template('game_details.html', gamePk=game_id, m=msg, m2=game_date, away_team=away, home_team=home, all_teams=teams)
     else:
         # game is either done or in-progress, do everything else
         msg = ''
@@ -190,12 +193,13 @@ def get_game_details(game_id):
                     'desc':penalty_description
                     }
             penalties.append(penalty_details)
-        return render_template('game_details.html', gamePk=game_id, away_team=away_abbr, home_team=home_abbr,  m=msg, sog=shots, goal=goals, goal_scoring=goal_details, penalty=penalties, away_box=away_box_stats, home_box=home_box_stats)
+        return render_template('game_details.html', gamePk=game_id, away_team=away_abbr, home_team=home_abbr,  m=msg, sog=shots, goal=goals, goal_scoring=goal_details, penalty=penalties, away_box=away_box_stats, home_box=home_box_stats, all_teams=teams)
 
 @app.route('/team/<team_id>')
 def get_team(team_id):
     # TODO: implement ID check that doesn't rely upon an API query
     hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
     sid = hockeyHelp.get_current_season()
     # first we gather the regular standings
     url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season='+str(sid)+',person(name,stats(splits=[statsSingleSeason]))))'
@@ -229,7 +233,7 @@ def get_team(team_id):
             # no stats found
             pass
     team_scores = get_team_scores(team_id)
-    return render_template('team.html', t=team_id, roster_stats=ps, g=team_scores)
+    return render_template('team.html', t=team_id, roster_stats=ps, g=team_scores, all_teams=teams)
 
 @app.route('/team/<team_id>/playoffs')
 def get_team_playoffs(team_id):
@@ -272,6 +276,7 @@ def get_team_playoffs(team_id):
 def get_standings():
     # first we gather the regular standings
     hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
     sid = hockeyHelp.get_current_season()
     url = 'https://statsapi.web.nhl.com/api/v1/standings/byDivision?season='+sid
     records = requests.get(url).json()
@@ -307,12 +312,13 @@ def get_standings():
     for i in [0,1]:
             wc_teams.append(eastern['teamRecords'][i]['team']['name'])
             wc_teams.append(western['teamRecords'][i]['team']['name'])
-    return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,wc=wc_teams)
+    return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,wc=wc_teams,all_teams=teams)
 
 @app.route('/scores')
 def get_scores():
     #scores = {'away_team':'FLA','away_score':'4','home_team':'TOR','home_score':'7'}
     hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
     local = arrow.utcnow()
     td = local.to('US/Eastern').format('YYYY-MM-DD')
     url = 'https://statsapi.web.nhl.com/api/v1/schedule?expand=schedule.linescore&date='+td
@@ -320,7 +326,7 @@ def get_scores():
     game_data = [] 
     if games['totalItems'] == 0:
         # no games found
-        return render_template('scores.html',msg="no games today :(")
+        return render_template('scores.html',msg="no games today :(", all_teams=teams)
     else:
         for g in games['dates'][0]['games']:
             game_id = g['gamePk']
@@ -340,7 +346,7 @@ def get_scores():
                 game_state = utc.to('US/Eastern').format('hh:mm A ZZZ')
             game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state, 'game_id': game_id}
             game_data.append(game_details)
-        return render_template('scores.html',scores=game_data)
+        return render_template('scores.html',scores=game_data, all_teams=teams)
 
 #@app.route('/scores/<team_id>')
 def get_team_scores(team_id):
@@ -387,16 +393,20 @@ def get_team_scores(team_id):
 @app.route('/schedule')
 def get_schedule():
     # default is to check for games scheduled today
+    hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
     utc = arrow.utcnow()
     default_day = utc.format('YYYY-MM-DD')
-    return render_template('schedule.html',defaultDay=default_day)
+    return render_template('schedule.html',defaultDay=default_day,all_teams=teams)
 
 @app.route('/schedule/<team_id>')
 def get_schedule_team(team_id):
     # default is to check for games scheduled today
+    hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
     utc = arrow.utcnow()
     default_day = utc.format('YYYY-MM-DD')
-    return render_template('schedule.html',defaultDay=default_day,team=team_id)
+    return render_template('schedule.html',defaultDay=default_day,team=team_id,all_teams=teams)
 
 @app.route('/mock')
 def get_mock():

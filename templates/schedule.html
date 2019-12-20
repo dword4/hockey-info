@@ -1,11 +1,20 @@
-<!doctype html>
-<title>Schedule</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
+
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 
 <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script> 
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
 <link href='https://unpkg.com/@fullcalendar/core@4.2.0/main.min.css' rel='stylesheet' />
 
 <link href='https://unpkg.com/@fullcalendar/daygrid@4.2.0/main.min.css' rel='stylesheet' />
@@ -76,10 +85,29 @@
 
 </script>
 {% endif %}
-{% include 'navigation.html' %}
-<content id="content">
-
-</content>
-<br /><br />
-<br /><br />
+</head>
+<body>
+	<ul class="nav nav-tabs nav-justified bg-danger text-light">
+		<li class="nav-item">
+				<a class="nav-link text-light" href="/"><span class="iconify" data-icon="emojione-monotone:ice-hockey" data-inline="false" style="color: #FFFFFF;"></span></a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/scores">Scores</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/standings">Standings</a>
+		</li>
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle text-light" data-toggle="dropdown" href="#">Schedule</a>
+			<div class="dropdown-menu bg-light">
+			  <a class="dropdown-item" href="/schedule">Full Schedule</a>
+			{% for key, value in all_teams.items() %}
+			  <a class="dropdown-item" href="/schedule/{{ value }}">{{ key }}</a>
+			{% endfor %}
+			</div>
+		</li>
+	</ul>
+<body>
 <div id="calendar" style="position: relative; left: 0%"></div>
+</body>
+</html>

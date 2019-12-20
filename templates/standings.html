@@ -1,18 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
+</head>
+<body>
+	<ul class="nav nav-tabs nav-justified bg-danger text-light">
+		<li class="nav-item">
+				<a class="nav-link text-light" href="/"><span class="iconify" data-icon="emojione-monotone:ice-hockey" data-inline="false" style="color: #FFFFFF;"></span></a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/scores">Scores</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/standings">Standings</a>
+		</li>
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle text-light" data-toggle="dropdown" href="#">Schedule</a>
+			<div class="dropdown-menu bg-light">
+			  <a class="dropdown-item" href="schedule">Full Schedule</a>
+			{% for key, value in all_teams.items() %}
+			  <a class="dropdown-item" href="/schedule/{{ value }}">{{ key }}</a>
+			{% endfor %}
+			</div>
+		</li>
+	</ul>
+<body>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-{% include 'navigation.html' %}
-<br />
+<!-- BEGIN DATA -->
 <h2>Eastern Conference</h2>
-<table style="width: 75%">
+<table class="table table-striped">
 	<tr>
-		<td style="width: 50%">Team</td>
-		<td style="width: 5%;">Points</td>
-		<td style="width: 5%;">L10</td>
-		<td style="width: 30%;">Division</td>
-		<td style="width: 5%;">Rank</td>
+		<td>Team</td>
+		<td>Points</td>
+		<td>L10</td>
+		<td>Division</td>
+		<td>Rank</td>
 	</tr>
 {% for team in east_conf %}
-	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #C7D9B7; font-size: 32px;" {% elif team.team_name in wc %}style="background: #FFD9DA; font-size: 22px"{% else %} style="background: #C8C8C8; font-size: 22px;" {% endif %}>
+	<tr>
 		<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.last_ten }}</td><td>{{ team.division }}</td>
 		<td>
 		{% if team.team_rank_division | int in [1,2,3] %}
@@ -26,16 +58,16 @@
 
 </table>
 <h2>Western Conference</h2>
-<table style="width: 75%">
+<table class="table table-striped">
 	<tr>
-		<td style="width: 50%">Team</td>
-		<td style="width: 5%;">Points</td>
-		<td style="width: 5%;">L10</td>
-		<td style="width: 30%;">Division</td>
-		<td style="width: 5%;">Rank</td>
+		<td>Team</td>
+		<td>Points</td>
+		<td>L10</td>
+		<td>Division</td>
+		<td>Rank</td>
 	</tr>
 {% for team in west_conf %}
-	<tr {% if team.team_rank_division | int in [1,2,3] %} style="background: #C7D9B7; font-size: 32px;" {% elif team.team_name in wc %}style="background: #FFD9DA; font-size: 22px"{% else %} style="background: #C8C8C8; font-size: 22px;" {% endif %}>
+	<tr>
 		<td><a href="team/{{team.team_id}}">{{ team.team_name }}</a></td><td>{{ team.team_points }}</td><td>{{ team.last_ten }}</td><td>{{ team.division }}</td>
 		<td>
 		{% if team.team_rank_division | int in [1,2,3] %}
@@ -47,3 +79,6 @@
 	</tr>
 {% endfor %}
 </table>
+<!-- END DATA -->
+</body>
+</html>
