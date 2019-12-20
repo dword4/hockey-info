@@ -193,7 +193,7 @@ def get_game_details(game_id):
                     'desc':penalty_description
                     }
             penalties.append(penalty_details)
-        return render_template('game_details.html', gamePk=game_id, away_team=away_abbr, home_team=home_abbr,  m=msg, sog=shots, goal=goals, goal_scoring=goal_details, penalty=penalties, away_box=away_box_stats, home_box=home_box_stats, all_teams=teams)
+        return render_template('game_details.html', gamePk=game_id, away_team=away_abbr, home_team=home_abbr,  m=msg, m2=game_date, sog=shots, goal=goals, goal_scoring=goal_details, penalty=penalties, away_box=away_box_stats, home_box=home_box_stats, all_teams=teams)
 
 @app.route('/team/<team_id>')
 def get_team(team_id):
