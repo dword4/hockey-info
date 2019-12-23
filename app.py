@@ -266,10 +266,10 @@ def get_team(team_id):
         'OT': stats_ot,
         'SA': stats_sa,
         'SVS': stats_svs,
-        'SVP': stats_svp,
+        'SVP': round(stats_svp,2),
         'GA': stats_ga,
-        'GAA': stats_gaa,
-        'TOI': stats_toi,
+        'GAA': round(stats_gaa,2),
+        'TOI': round(stats_toi/60),
         'PIM': stats_pim
         }
         gs.append(statline)
