@@ -110,10 +110,6 @@ $(document).ready( function () {
 <table id="table_id2" class="display">
 	<thead>
 		<tr>
-
-    <!--
-# desired stats: S/C(Shoots/Catches), GP, GS, W, L, OT (Overtime Losses), SA (Shots Against), Svs (Saves), GA (Goals Against), Sv% (Save %) GAA (Goals-Against-Avg), TOI, PIM
--->
 			<th>Player</th>
 			<th title="Shoots/Catches">Shoots/Catches</th>
 			<th title="Games Played">GP</th>
@@ -166,6 +162,9 @@ $(document).ready( function () {
 				<td>{{ game.home_team }}</td>
 				<td>{{ game.home_team_score }}</td>	
 			</tr>
+			<tr>
+				<td colspan="2">{{ game.game_date }}</td>
+			</tr>
 			{% else %}
 			<tr>
 				<td>{{ game.away_team }}</td>
@@ -174,6 +173,9 @@ $(document).ready( function () {
 			<tr>
 				<td><strong>{{ game.home_team }}</strong></td>
 				<td><strong>{{ game.home_team_score }}</strong></td>	
+			</tr>
+			<tr>
+				<td colspan="2">{{ game.game_date }}</td>
 			</tr>
 			{% endif %}
 			

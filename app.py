@@ -407,6 +407,8 @@ def get_team_scores(team_id):
     for game in season_games['dates']:
         game_id = game['games'][0]['gamePk']
         game_date = game['games'][0]['gameDate']
+        temp_utc = arrow.get(game_date)
+        game_start = temp_utc.to('US/Eastern').format('MM-DD-YYYY hh:mm A ZZZ')
         game_status = game['games'][0]['status']['abstractGameState']
         away_team = game['games'][0]['teams']['away']
         home_team = game['games'][0]['teams']['home']
@@ -420,6 +422,7 @@ def get_team_scores(team_id):
         home_abbr = hockeyHelp.get_team_abbr(home_team_id)
         line_data = {
                 'game_id': game_id,
+				'game_date': game_start,
                 'away_team': away_abbr,
                 'away_team_id': away_team_id,
                 'away_team_score': away_team_score,
@@ -428,6 +431,7 @@ def get_team_scores(team_id):
                 'home_team_score': home_team_score
                 }
         holder.append(line_data)
+    holder.reverse()
     #return render_template('team_scores.html',data=holder)
     return holder
 @app.route('/schedule')
