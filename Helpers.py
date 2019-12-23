@@ -5,6 +5,12 @@ import json
 import arrow
 
 class Helpers(object):
+    # converts team_id value to franchise_id used by some endpoints
+    def team_to_franchise(self, team_id):
+        url = 'https://statsapi.web.nhl.com/api/v1/teams/'+str(team_id)+'?expand=team.franchise'
+        team_data = requests.get(url).json()
+        franchise_id = team_data['teams'][0]['franchise']['franchiseId']
+        return franchise_id
 
     # returns current season id
     def get_current_season(self):

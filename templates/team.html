@@ -43,6 +43,13 @@ $(document).ready( function () {
 	});
 } );
 </script>
+<script>
+$(document).ready( function () {
+    $('#table_id2').DataTable( {
+		paging: false
+	});
+} );
+</script>
 <br /><br/>
 <!-- nav tabs for different groups of players -->
 <ul class="nav nav-tabs">
@@ -100,6 +107,50 @@ $(document).ready( function () {
 
 		<div class="tab-pane container fade" id="goalies">
 			<h1>GOALIES!</h1>
+<table id="table_id2" class="display">
+	<thead>
+		<tr>
+
+    <!--
+# desired stats: S/C(Shoots/Catches), GP, GS, W, L, OT (Overtime Losses), SA (Shots Against), Svs (Saves), GA (Goals Against), Sv% (Save %) GAA (Goals-Against-Avg), TOI, PIM
+-->
+			<th>Player</th>
+			<th title="Shoots/Catches">Shoots/Catches</th>
+			<th title="Games Played">GP</th>
+			<th title="Games Started">GS</th>
+			<th title="Wins">W</th>
+			<th title="Losses">L</th>
+			<th title="Overtime Losses">OT</th>
+			<th title="Shots Against">SA</th>
+			<th title="Saves">Svs</th>
+			<th title="Goals Against">GA</th>
+			<th title="Save %">Sv%</th>
+			<th title="Goals Against Avg">GAA</th>
+			<th title="Time On Ice">TOI</th>
+			<th title="Penalty Minutes">PIM</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for g in goalie_stats %}
+		<tr>
+			<td>{{ g.NAME }}</td>
+			<td>{{ g.SC }}</td>
+			<td>{{ g.GP }}</td>
+			<td>{{ g.GS }}</td>
+			<td>{{ g.W }}</td>
+			<td>{{ g.L }}</td>
+			<td>{{ g.OT }}</td>
+			<td>{{ g.SA }}</td>
+			<td>{{ g.SVS}}</td>
+			<td>{{ g.GA }}</td>
+			<td>{{ g.SVP }}</td>
+			<td>{{ g.GAA }}</td>
+			<td>{{ g.TOI }}</td>
+			<td>{{ g.PIM }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
 		</div>
 		<div class="tab-pane container fade" id="previous-games">
 			<h1>Previous Games</h1>
