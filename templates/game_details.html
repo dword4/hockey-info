@@ -1,70 +1,92 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<title></title>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
+</head>
 <body>
-{% include 'navigation.html' %}
-<div style="position: absolute; top: 8%"><br />
-	<h1>{{ away_team }} @ {{ home_team }}</h1>
+	<ul class="nav nav-tabs nav-justified bg-danger text-light">
+		<li class="nav-item">
+				<a class="nav-link text-light" href="/"><span class="iconify" data-icon="emojione-monotone:ice-hockey" data-inline="false" style="color: #FFFFFF;"></span></a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/scores">Scores</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/standings">Standings</a>
+		</li>
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle text-light" data-toggle="dropdown" href="#">Schedule</a>
+			<div class="dropdown-menu bg-light">
+			  <a class="dropdown-item" href="schedule">Full Schedule</a>
+			{% for key, value in all_teams.items() %}
+			  <a class="dropdown-item" href="/schedule/{{ value }}">{{ key }}</a>
+			{% endfor %}
+			</div>
+		</li>
+	</ul>
+<body>
+<!-- BEGIN DATA -->	
+    <h1>{{ away_team }} @ {{ home_team }}</h1>
 	{% if m is defined %}
 	<h1>{{ m }}</h1>
 	<h3>Scheduled Start: {{ m2 }}</h3>
 	{% endif %}<br />
 	{% if away_box is defined and home_box is defined %}
 	<h2>Boxscore</h2>
-	<table style="border: 1px solid; font-size: 32px">
+	<table class="table-sm table-striped">
 		<tr>
-			<td><h6>{{ away_team }}</h6></td>
-			<td><h6>{{ home_team }}</h6></td>
+			<th>{{ away_team }}</th>
+			<th>{{ home_team }}</th>
 		</tr>
 		<tr>
 			<td>
-				<ul>
 	{% for key in away_box %}
-		<!--<strong>{{key}}</strong> {{ away_box[key] }}<br />-->
-		<li style="background-color: {{ loop.cycle('lightgrey', 'white') }}">{{ key }} {{away_box[key] }}</li>
+	{{ key }} {{away_box[key] }}</br >
 	{% endfor %}
-		</ul>
 		</td>
 		<td>
-	<ul>
 	{% for key in home_box %}
-	<!--<strong>{{ key }}</strong> {{ home_box[key] }}<br />-->
-		<li style="background-color: {{ loop.cycle('lightgrey', 'white') }}">{{ key }} {{home_box[key] }}</li>
+	{{ key }} {{home_box[key] }}<br />
 	{% endfor %}
-	</ul>
 		</td>
 		</tr>
 	</table>
 	{% endif %}
 	{% if goal is defined %}
 	<h2>Goals</h2>
-	<table style="border: 1px solid; font-size: 32px">
+	<table class="table-sm table-striped">
 		<tr>
 			<th>Period</th>
 			<th>{{ home_team }} </th>
 			<th>{{ away_team }} </th>
 		</tr>
 		<tr>
-			<td id="td-center">1</td>
-			<td id="td-center">{{ goal.p1_home }}</td>
-			<td id="td-center">{{ goal.p1_away }}</td>
+			<td>1</td>
+			<td>{{ goal.p1_home }}</td>
+			<td>{{ goal.p1_away }}</td>
 		</tr>
 		<tr>
-			<td id="td-center">2</td>
-			<td id="td-center">{{ goal.p2_home }}</td>
-			<td id="td-center">{{ goal.p2_away }}</td>
+			<td>2</td>
+			<td>{{ goal.p2_home }}</td>
+			<td>{{ goal.p2_away }}</td>
 		</tr>
 		<tr>
-			<td id="td-center">3</td>
-			<td id="td-center">{{ goal.p3_home }}</td>
-			<td id="td-center">{{ goal.p3_away }}</td>
+			<td>3</td>
+			<td>{{ goal.p3_home }}</td>
+			<td>{{ goal.p3_away }}</td>
 		</tr>
 	</table>
 	{% endif %}
 	{% if goal is defined %}
 	<br />
-	<table style="border: 1px solid; font-size: 32px ">
+	<table class="table table-striped">
 		<tr>
 			<th>Period</th>
 			<th>Time</th>
@@ -83,7 +105,7 @@
 	{% endif %}
 	{% if sog is defined %}
 	<h2>Shots On Goal</h2>	
-	<table style="border: 1px solid; font-size: 32px">
+	<table class="table table-striped">
 		<tr>
 			<th id="td-center">Period</th>
 			<th id="td-center">{{ home_team }}</th>
@@ -110,7 +132,7 @@
 	{% endif %}
 	{% if penalty is defined %}
 	<h2>Penalties</h2>
-	<table style="border: 1px solid; font-size: 32px">
+	<table class="table table-striped">
 		<tr>
 			<th>Period</th>
 			<th>Time</th>
@@ -127,6 +149,5 @@
 	{% endfor %}
 	</table>
 	{% endif %}
-</div>
 </body>
 </html>

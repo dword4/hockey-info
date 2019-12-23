@@ -1,10 +1,41 @@
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
-
-<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script> 
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-{% include 'navigation.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
+    
+  <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+</head>
+<body>
+	<ul class="nav nav-tabs nav-justified bg-danger text-light">
+		<li class="nav-item">
+				<a class="nav-link text-light" href="/"><span class="iconify" data-icon="emojione-monotone:ice-hockey" data-inline="false" style="color: #FFFFFF;"></span></a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/scores">Scores</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link text-light" href="/standings">Standings</a>
+		</li>
+		<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle text-light" data-toggle="dropdown" href="#">Schedule</a>
+			<div class="dropdown-menu bg-light">
+			  <a class="dropdown-item" href="schedule">Full Schedule</a>
+			{% for key, value in all_teams.items() %}
+			  <a class="dropdown-item" href="/schedule/{{ value }}">{{ key }}</a>
+			{% endfor %}
+			</div>
+		</li>
+	</ul>
+<body>
+<!-- BEGIN ACTUAL DATA -->
 <script>
 $(document).ready( function () {
     $('#table_id').DataTable( {
@@ -12,13 +43,39 @@ $(document).ready( function () {
 	});
 } );
 </script>
+<script>
+$(document).ready( function () {
+    $('#table_id2').DataTable( {
+		paging: false
+	});
+} );
+</script>
 <br /><br/>
+<!-- nav tabs for different groups of players -->
+<ul class="nav nav-tabs">
+	<li class="nav-item">
+		<a class="nav-link" data-toggle="tab" href="#skaters">Skaters</a>
+	</li>
+
+	<li class="nav-item">
+		<a class="nav-link" data-toggle="tab" href="#goalies">Goalies</a>
+	</li>
+
+	<li class="nav-item">
+		<a class="nav-link" data-toggle="tab" href="#previous-games">Previous Games</a>
+	</li>
+</ul>
 <h3 style="text-align: center;">>Regular Season< | <a href="/team/{{ t }}/playoffs">Playoffs</a></h3>
-<h2>Player Stats</h2>
+
+<!-- panes for data sets -->
+<div class="tab-content">
+		<div class="tab-pane container active" id="skaters">
+			<h1>SKATERS</h1>
 <table id="table_id" class="display">
 	<thead>
 		<tr>
 			<th>Player</th>
+			<th title="Position">Position</th>
 			<th title="Games Played">GP</th>
 			<th title="Goals">G</th>
 			<th title="Shots">S</th>
@@ -33,6 +90,7 @@ $(document).ready( function () {
 		{% for p in roster_stats %}
 		<tr>
 			<td>{{ p.NAME }}</td>
+			<td>{{ p.POSITION }}</td>
 			<td>{{ p.GP }}</td>
 			<td>{{ p.G }}</td>
 			<td>{{ p.S }}</td>
@@ -45,29 +103,87 @@ $(document).ready( function () {
 		{% endfor %}
 	</tbody>
 </table>
-<h2>Scores</h2>
-{% for game in g %}
-<a href="/game/{{ game.game_id }}" target="_new">
-<table border="1px solid black" style="font-size: 22px; border-collapse: collapse;">
-	{% if game.away_team_score > game.home_team_score %}
-	<tr>
-		<td><strong>{{ game.away_team }}</strong></td>
-		<td><strong>{{ game.away_team_score }}</strong></td>
-	</tr>
-	<tr>
-		<td>{{ game.home_team }}</td>
-		<td>{{ game.home_team_score }}</td>	
-	</tr>
-	{% else %}
-	<tr>
-		<td>{{ game.away_team }}</td>
-		<td>{{ game.away_team_score }}</td>
-	</tr>
-	<tr>
-		<td><strong>{{ game.home_team }}</strong></td>
-		<td><strong>{{ game.home_team_score }}</strong></td>	
-	</tr>
-	{% endif %}
-	
-</table></a><br />
-{% endfor %}
+		</div>
+
+		<div class="tab-pane container fade" id="goalies">
+			<h1>GOALIES!</h1>
+<table id="table_id2" class="display">
+	<thead>
+		<tr>
+			<th>Player</th>
+			<th title="Shoots/Catches">Shoots/Catches</th>
+			<th title="Games Played">GP</th>
+			<th title="Games Started">GS</th>
+			<th title="Wins">W</th>
+			<th title="Losses">L</th>
+			<th title="Overtime Losses">OT</th>
+			<th title="Shots Against">SA</th>
+			<th title="Saves">Svs</th>
+			<th title="Goals Against">GA</th>
+			<th title="Save %">Sv%</th>
+			<th title="Goals Against Avg">GAA</th>
+			<th title="Time On Ice">TOI</th>
+			<th title="Penalty Minutes">PIM</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for g in goalie_stats %}
+		<tr>
+			<td>{{ g.NAME }}</td>
+			<td>{{ g.SC }}</td>
+			<td>{{ g.GP }}</td>
+			<td>{{ g.GS }}</td>
+			<td>{{ g.W }}</td>
+			<td>{{ g.L }}</td>
+			<td>{{ g.OT }}</td>
+			<td>{{ g.SA }}</td>
+			<td>{{ g.SVS}}</td>
+			<td>{{ g.GA }}</td>
+			<td>{{ g.SVP }}</td>
+			<td>{{ g.GAA }}</td>
+			<td>{{ g.TOI }}</td>
+			<td>{{ g.PIM }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+		</div>
+		<div class="tab-pane container fade" id="previous-games">
+			<h1>Previous Games</h1>
+		{% for game in g %}
+		<a href="/game/{{ game.game_id }}" target="_new">
+		<table border="1px solid black" style="font-size: 22px; border-collapse: collapse;">
+			{% if game.away_team_score > game.home_team_score %}
+			<tr>
+				<td><strong>{{ game.away_team }}</strong></td>
+				<td><strong>{{ game.away_team_score }}</strong></td>
+			</tr>
+			<tr>
+				<td>{{ game.home_team }}</td>
+				<td>{{ game.home_team_score }}</td>	
+			</tr>
+			<tr>
+				<td colspan="2">{{ game.game_date }}</td>
+			</tr>
+			{% else %}
+			<tr>
+				<td>{{ game.away_team }}</td>
+				<td>{{ game.away_team_score }}</td>
+			</tr>
+			<tr>
+				<td><strong>{{ game.home_team }}</strong></td>
+				<td><strong>{{ game.home_team_score }}</strong></td>	
+			</tr>
+			<tr>
+				<td colspan="2">{{ game.game_date }}</td>
+			</tr>
+			{% endif %}
+			
+		</table></a><br />
+		{% endfor %}
+		</div>
+</div>
+		
+<!-- END ACTUAL DATA -->
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title></title>
+  <title>Bootstrap Example</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -13,13 +13,13 @@
 <body>
 	<ul class="nav nav-tabs nav-justified bg-danger text-light">
 		<li class="nav-item">
-				<a class="nav-link text-light" href="/"><span class="iconify" data-icon="emojione-monotone:ice-hockey" data-inline="false" style="color: #FFFFFF;"></span></a>
+				<a class="nav-link text-light" href="#"><span class="iconify" data-icon="emojione-monotone:ice-hockey" data-inline="false" style="color: #FFFFFF;"></span></a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link text-light" href="/scores">Scores</a>
+			<a class="nav-link text-light">Scores</a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link text-light" href="/standings">Standings</a>
+			<a class="nav-link text-light">Standings</a>
 		</li>
 		<li class="nav-item dropdown">
 			<a class="nav-link dropdown-toggle text-light" data-toggle="dropdown" href="#">Schedule</a>
@@ -32,27 +32,4 @@
 		</li>
 	</ul>
 <body>
-<!-- BEGIN DATA -->
-{% if msg is defined %}<span style="color: black;"><h3>{{ msg }}</h3></span>{% endif %}
-<br /><br /><br />
-{% if scores is defined %} <br /><br />
-<div class="card-deck">
-{% for item in scores %}
-	<div class="card">
-	<a href="/game/{{ item.game_id }}">
-			<div class="card-body">
-			{{ item.away_team }}
-			{{ item.away_score }}
-			{{ item.home_team }}
-	{{ item.home_score }}
-			</div>
-			<div class="card-footer">
-	{{ item.game_state }}
-	</div>
-	</div>
-{% endfor %}
-</div>
-{% endif %}
-<!-- END DATA -->
-</body>
 </html>
