@@ -499,6 +499,13 @@ def get_game_date(game_id):
 
     return arrow_game_date.to('US/Eastern').format('YYYY-MM-DD hh:mm A ZZZ')
 
+# returns franchiseId value used in some other API querries
+def team_to_franchise(team_id):
+    url = 'https://statsapi.web.nhl.com/api/v1/teams/'+str(team_id)+'?expand=team.franchise'
+    team_data = requests.get(url).json()
+    franchise_id = team_data['teams'][0]['franchise']['franchiseId']
+    return franchise_id
+
 # gets headlines (limit of 15 hardcoded for now)
 def get_headlines():
     bulk_headlines = []
