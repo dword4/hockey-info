@@ -25,3 +25,4 @@ flask run --host=0.0.0.0
 
 If you happen to have a Docker server you can use [hockey-info-docker](https://gitlab.com/dword4/hockey-info-docker) to deploy it.
 
+---
