@@ -238,6 +238,7 @@ def get_team(team_id):
 	# now we do goalie stats
 
     url = 'https://api.nhle.com/stats/rest/en/goalie/summary?isAggregate=false&isGame=false&sort=%5B%7B%22property%22:%22wins%22,%22direction%22:%22DESC%22%7D,%7B%22property%22:%22savePct%22,%22direction%22:%22DESC%22%7D%5D&start=0&limit=50&factCayenneExp=gamesPlayed%3E=1&cayenneExp=franchiseId%3D'+str(fid)+'%20and%20gameTypeId=2%20and%20seasonId%3C='+str(sid)+'%20and%20seasonId%3E='+str(sid)
+    print(url)
     records = requests.get(url).json()
     # desired stats: S/C(Shoots/Catches), GP, GS, W, L, OT (Overtime Losses), SA (Shots Against), Svs (Saves), GA (Goals Against), Sv% (Save %) GAA (Goals-Against-Avg), TOI, PIM
     roster = records['data']
@@ -250,7 +251,10 @@ def get_team(team_id):
         stats_ot = goalie['otLosses']
         stats_sa = goalie['shotsAgainst']
         stats_svs = goalie['saves']
-        stats_svp = goalie['savePct']
+        if goalie['savePct'] == None:
+            stats_svp = 0
+        else:
+            stats_svp = goalie['savePct']
         stats_sc = goalie['shootsCatches']
         stats_ga = goalie['goalsAgainst']
         stats_gaa = goalie['goalsAgainstAverage']
