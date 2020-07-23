@@ -319,6 +319,7 @@ def get_standings():
     teams = hockeyHelp.get_all_teams()
     sid = hockeyHelp.get_current_season()
     url = 'https://statsapi.web.nhl.com/api/v1/standings/byDivision?season='+sid
+    print(url)
     records = requests.get(url).json()
     # 0 -> metro, 1-> atlantic, 2 -> central 3-> pacific
     standings = []
@@ -343,16 +344,25 @@ def get_standings():
     east += master[1]
     west = master[2]
     west += master[3]
-
-    # now to collect wildcard info
-    url = 'https://statsapi.web.nhl.com/api/v1/standings/wildCard'
-    records = requests.get(url).json()
-    (eastern, western) = records['records']
-    wc_teams = []
-    for i in [0,1]:
-            wc_teams.append(eastern['teamRecords'][i]['team']['name'])
-            wc_teams.append(western['teamRecords'][i]['team']['name'])
-    return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,wc=wc_teams,all_teams=teams)
+    '''
+        The NHL has altered the playoff format right now because of Covid19 and now
+        there are no wildcards for this one-off playoff version they are doing.  The
+        easiest solution here is a simple if/else that checks if the normal standings 
+        endpoint is zero across all times and then just skips the wildcard data completely.
+    '''
+    if check_wildcard() == 0:
+        # handling one-off and not displaying WC info
+        return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,all_teams=teams)
+    else:
+        # WC is present, render it normally
+        url = 'https://statsapi.web.nhl.com/api/v1/standings/wildCard'
+        records = requests.get(url).json()
+        (eastern, western) = records['records']
+        wc_teams = []
+        for i in [0,1]:
+                wc_teams.append(eastern['teamRecords'][i]['team']['name'])
+                wc_teams.append(western['teamRecords'][i]['team']['name'])
+        return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,wc=wc_teams,all_teams=teams)
 
 @app.route('/scores')
 def get_scores():
@@ -531,6 +541,7 @@ def get_last_ten(team_id):
             if team_id == int(team['team']['id']):
                 last_ten = "%s-%s-%s" % (str(l10_data['wins']), l10_data['losses'], l10_data['ot'])
     return last_ten 
+
 # returns the date/time for a game ID
 def get_game_date(game_id):
     res = 'https://statsapi.web.nhl.com/api/v1/schedule?site=en_nhl&gamePk='+game_id+'&leaderGameTypes=&expand=schedule.broadcasts.all,schedule.radioBroadcasts,schedule.teams,schedule.ticket,schedule.game.content.media.epg'
@@ -543,7 +554,6 @@ def get_game_date(game_id):
 
     return arrow_game_date.to('US/Eastern').format('YYYY-MM-DD hh:mm A ZZZ')
 
-
 # gets headlines (limit of 15 hardcoded for now)
 def get_headlines():
     bulk_headlines = []
@@ -555,3 +565,26 @@ def get_headlines():
         data = {'headline': headline, 'link': link}
         bulk_headlines.append(data)
     return bulk_headlines
+
+def check_wildcard():
+    url = 'http://statsapi.web.nhl.com/api/v1/standings'
+    standings = requests.get(url).json()
+    divisions = standings['records']
+
+    wc_overall = 0
+
+    for division in divisions:
+        teams = division['teamRecords']
+        for team in teams:
+            team_name = team['team']['name']
+            team_wc_rank = team['wildCardRank']
+            if int(team_wc_rank) == 0:
+                pass
+            else:
+                wc_overall += 1
+    if wc_overall == 0:
+        # no wildcard here boss
+        return 0
+    else:
+        # wc detected, parse on!
+        return 1
