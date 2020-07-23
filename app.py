@@ -4,12 +4,16 @@ import requests
 import requests_cache
 import json
 import arrow
+import subprocess
 
 requests_cache.install_cache('hockey_cache', expire_after=300)
 
 app = Flask(__name__)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int("5000"), threaded=True)
+
+# version display stuff
+APP_VERSION = subprocess.check_output(["git","rev-parse","HEAD"]).strip().decode("utf-8")
 
 @app.route('/')
 def show_playoffs():
@@ -27,7 +31,7 @@ def show_playoffs():
                     playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
             return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h,all_teams=teams)
         else:
-            return render_template('index.html', headlines=h,all_teams=teams)
+            return render_template('index.html', headlines=h,all_teams=teams,version=APP_VERSION)
 
 # game.types [ P = Playoffs, PR = Preasons, R = Regular , N = NO HOCKEY]
 def get_season_status():
