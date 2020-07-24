@@ -238,8 +238,8 @@ def get_team(team_id):
             # no stats found
             pass
     team_scores = get_team_scores(team_id)
-	
-	# now we do goalie stats
+    
+    # now we do goalie stats
 
     url = 'https://api.nhle.com/stats/rest/en/goalie/summary?isAggregate=false&isGame=false&sort=%5B%7B%22property%22:%22wins%22,%22direction%22:%22DESC%22%7D,%7B%22property%22:%22savePct%22,%22direction%22:%22DESC%22%7D%5D&start=0&limit=50&factCayenneExp=gamesPlayed%3E=1&cayenneExp=franchiseId%3D'+str(fid)+'%20and%20gameTypeId=2%20and%20seasonId%3C='+str(sid)+'%20and%20seasonId%3E='+str(sid)
     print(url)
@@ -287,39 +287,47 @@ def get_team(team_id):
 def get_team_playoffs(team_id):
     # first we gather the regular standings
     hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
     sid = hockeyHelp.get_current_season()
     url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season='+str(sid)+',person(name,stats(splits=[statsSingleSeasonPlayoffs]))))'
-    records = requests.get(url).json()
-    # desired stats: GP, G, A, P, +/-, PIM, PPG, PPP, SHG, SHP, GWG, OTG, S and S%
-    roster = records['teams'][0]['franchise']['roster']['roster']
-    ps = []
-    for player in roster:
-        player_name = player['person']['fullName']
-        player_position = player['person']['primaryPosition']['code']
-        try:
-            player_stats = player['person']['stats'][0]['splits'][0]['stat']
-            if player_position != "G":
-                stats_gp = player_stats['games']
-                stats_g = player_stats['goals']
-                stats_a = player_stats['assists']
-                stats_p = player_stats['points']
-                stats_plusMinus = player_stats['plusMinus']
-                stats_pim = player_stats['penaltyMinutes']
-                stats_ppg = player_stats['powerPlayGoals']
-                stats_ppp = player_stats['powerPlayPoints']
-                stats_shg = player_stats['shortHandedGoals']
-                stats_shp = player_stats['shortHandedPoints']
-                stats_gwg = player_stats['gameWinningGoals']
-                stats_otg = player_stats['overTimeGoals']
-                stats_s = player_stats['shots']
-                stats_sp = player_stats['shotPct']
-                statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim, 'PPG': stats_ppg, 'S': stats_s}    
-                ps.append(statline)
-        except:
-            # no stats found
-            pass
 
-    return render_template('team-playoffs.html', t=team_id, roster_stats=ps)
+    team_playoff_status = check_team_playoffs_stats(team_id, str(sid))
+    if team_playoff_status == 0:
+        # no stats to show
+        return render_template('team-playoffs.html', all_teams=teams)
+    else:
+        # stats to show
+        records = requests.get(url).json()
+        # desired stats: GP, G, A, P, +/-, PIM, PPG, PPP, SHG, SHP, GWG, OTG, S and S%
+        roster = records['teams'][0]['franchise']['roster']['roster']
+        ps = []
+        for player in roster:
+            player_name = player['person']['fullName']
+            player_position = player['person']['primaryPosition']['code']
+            try:
+                player_stats = player['person']['stats'][0]['splits'][0]['stat']
+                if player_position != "G":
+                    stats_gp = player_stats['games']
+                    stats_g = player_stats['goals']
+                    stats_a = player_stats['assists']
+                    stats_p = player_stats['points']
+                    stats_plusMinus = player_stats['plusMinus']
+                    stats_pim = player_stats['penaltyMinutes']
+                    stats_ppg = player_stats['powerPlayGoals']
+                    stats_ppp = player_stats['powerPlayPoints']
+                    stats_shg = player_stats['shortHandedGoals']
+                    stats_shp = player_stats['shortHandedPoints']
+                    stats_gwg = player_stats['gameWinningGoals']
+                    stats_otg = player_stats['overTimeGoals']
+                    stats_s = player_stats['shots']
+                    stats_sp = player_stats['shotPct']
+                    statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim, 'PPG': stats_ppg, 'S': stats_s}    
+                    ps.append(statline)
+            except:
+                # no stats found
+                pass
+
+        return render_template('team-playoffs.html', t=team_id, roster_stats=ps, all_teams=teams)
 @app.route('/standings')
 def get_standings():
     # first we gather the regular standings
@@ -440,7 +448,7 @@ def get_team_scores(team_id):
         home_abbr = hockeyHelp.get_team_abbr(home_team_id)
         line_data = {
                 'game_id': game_id,
-				'game_date': game_start,
+                'game_date': game_start,
                 'away_team': away_abbr,
                 'away_team_id': away_team_id,
                 'away_team_score': away_team_score,
@@ -574,6 +582,7 @@ def get_headlines():
         bulk_headlines.append(data)
     return bulk_headlines
 
+# returns 0 if no wildcard data is found, 1 otherwise
 def check_wildcard():
     url = 'http://statsapi.web.nhl.com/api/v1/standings'
     standings = requests.get(url).json()
@@ -595,4 +604,26 @@ def check_wildcard():
         return 0
     else:
         # wc detected, parse on!
+        return 1
+
+# returns 0 if there are no stats for that team/season in the playoffs or 1 if there is
+def check_team_playoffs_stats(tid, sid):
+    url = 'https://statsapi.web.nhl.com/api/v1/teams/'+tid+'?hydrate=franchise(roster(season='+sid+',person(name,stats(splits=[statsSingleSeasonPlayoffs]))))'
+
+    data = requests.get(url).json()
+
+    players = data['teams'][0]['franchise']['roster']['roster']
+    zero_count = 0
+    for person in players:
+        fullName = person['person']['fullName']
+        stats_split = person['person']['stats'][0]['splits']
+        if len(stats_split) == 0:
+            # no stats for this person in the current playoffs
+            pass
+        else:
+            # some kind of stat, adding to the counter
+            zero_count += 1
+    if zero_count == 0:
+        return 0 
+    else:
         return 1
