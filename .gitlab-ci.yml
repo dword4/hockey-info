@@ -30,21 +30,19 @@ before_script:
   - source venv/bin/activate
 
 test:
-  stage: test
-    script:
-    - pytest -v app_test.py
+  script:
+  - pytest -v app_test.py
 
 build-master:
+  # Official docker image.
+  image: docker:latest
   stage: build
-    # Official docker image.
-    image: docker:latest
-    stage: build
-    services:
-      - docker:dind
-    before_script:
-      - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-    script:
-      - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-      - docker push "$CI_REGISTRY_IMAGE"
-    only:
-      - master
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker push "$CI_REGISTRY_IMAGE"
+  only:
+    - master
