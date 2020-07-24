@@ -29,7 +29,7 @@ def show_playoffs():
             current_round = r['defaultRound']
             for series in r['rounds'][current_round-1]['series']:
                     playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
-            return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h,all_teams=teams)
+            return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h,all_teams=teams,version=APP_VERSION)
         else:
             return render_template('index.html', headlines=h,all_teams=teams,version=APP_VERSION)
 
@@ -97,7 +97,7 @@ def get_leaders():
         #print("%s - %s" % (player_name, player_value))
         player_data = {'player_name':player_name, 'value': player_value}
         assists.append(player_data)
-    return render_template('index.html', skater_points=points, skater_assists=assists)
+    return render_template('index.html', skater_points=points, skater_assists=assists,version=APP_VERSION)
 
 @app.route('/game/<game_id>')
 def get_game_details(game_id):
@@ -128,7 +128,7 @@ def get_game_details(game_id):
         home = "%s [L10: %s]" % (home_abbr, home_team_last_ten)
         #home = home_abbr + ' [L10: ' + home_team_last_ten + ']'
 
-        return render_template('game_details.html', gamePk=game_id, m=msg, m2=game_date, away_team=away, home_team=home, all_teams=teams)
+        return render_template('game_details.html', gamePk=game_id, m=msg, m2=game_date, away_team=away, home_team=home, all_teams=teams, version=APP_VERSION)
     else:
         # game is either done or in-progress, do everything else
         msg = ''
@@ -197,7 +197,7 @@ def get_game_details(game_id):
                     'desc':penalty_description
                     }
             penalties.append(penalty_details)
-        return render_template('game_details.html', gamePk=game_id, away_team=away_abbr, home_team=home_abbr,  m=msg, m2=game_date, sog=shots, goal=goals, goal_scoring=goal_details, penalty=penalties, away_box=away_box_stats, home_box=home_box_stats, all_teams=teams)
+        return render_template('game_details.html', gamePk=game_id, away_team=away_abbr, home_team=home_abbr,  m=msg, m2=game_date, sog=shots, goal=goals, goal_scoring=goal_details, penalty=penalties, away_box=away_box_stats, home_box=home_box_stats, all_teams=teams, version=APP_VERSION)
 
 @app.route('/team/<team_id>')
 def get_team(team_id):
@@ -281,7 +281,7 @@ def get_team(team_id):
         'PIM': stats_pim
         }
         gs.append(statline)
-    return render_template('team.html', t=team_id, roster_stats=ps, goalie_stats=gs, g=team_scores, all_teams=teams)
+    return render_template('team.html', t=team_id, roster_stats=ps, goalie_stats=gs, g=team_scores, all_teams=teams, version=APP_VERSION)
 
 @app.route('/team/<team_id>/playoffs')
 def get_team_playoffs(team_id):
@@ -294,7 +294,7 @@ def get_team_playoffs(team_id):
     team_playoff_status = check_team_playoffs_stats(team_id, str(sid))
     if team_playoff_status == 0:
         # no stats to show
-        return render_template('team-playoffs.html', all_teams=teams)
+        return render_template('team-playoffs.html', all_teams=teams, version=APP_VERSION)
     else:
         # stats to show
         records = requests.get(url).json()
@@ -327,7 +327,7 @@ def get_team_playoffs(team_id):
                 # no stats found
                 pass
 
-        return render_template('team-playoffs.html', t=team_id, roster_stats=ps, all_teams=teams)
+        return render_template('team-playoffs.html', t=team_id, roster_stats=ps, all_teams=teams, version=APP_VERSION)
 @app.route('/standings')
 def get_standings():
     # first we gather the regular standings
@@ -368,7 +368,7 @@ def get_standings():
     '''
     if check_wildcard() == 0:
         # handling one-off and not displaying WC info
-        return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,all_teams=teams)
+        return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,all_teams=teams, version=APP_VERSION)
     else:
         # WC is present, render it normally
         url = 'https://statsapi.web.nhl.com/api/v1/standings/wildCard'
@@ -378,7 +378,7 @@ def get_standings():
         for i in [0,1]:
                 wc_teams.append(eastern['teamRecords'][i]['team']['name'])
                 wc_teams.append(western['teamRecords'][i]['team']['name'])
-        return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,wc=wc_teams,all_teams=teams)
+        return render_template('standings.html',east_conf=east,west_conf=west,standings=standings,wc=wc_teams,all_teams=teams, version=APP_VERSION)
 
 @app.route('/scores')
 def get_scores():
@@ -392,7 +392,7 @@ def get_scores():
     game_data = [] 
     if games['totalItems'] == 0:
         # no games found
-        return render_template('scores.html',msg="no games today :(", all_teams=teams)
+        return render_template('scores.html',msg="no games today :(", all_teams=teams, version=APP_VERSION)
     else:
         for g in games['dates'][0]['games']:
             game_id = g['gamePk']
@@ -412,7 +412,7 @@ def get_scores():
                 game_state = utc.to('US/Eastern').format('hh:mm A ZZZ')
             game_details = {'away_team':away_team,'away_score':away_score,'home_team':home_team,'home_score':home_score,'game_state':game_state, 'game_id': game_id}
             game_data.append(game_details)
-        return render_template('scores.html',scores=game_data, all_teams=teams)
+        return render_template('scores.html',scores=game_data, all_teams=teams, version=APP_VERSION)
 
 #@app.route('/scores/<team_id>')
 def get_team_scores(team_id):
@@ -460,6 +460,7 @@ def get_team_scores(team_id):
     holder.reverse()
     #return render_template('team_scores.html',data=holder)
     return holder
+
 @app.route('/schedule')
 def get_schedule():
     # default is to check for games scheduled today
@@ -467,7 +468,7 @@ def get_schedule():
     teams = hockeyHelp.get_all_teams()
     utc = arrow.utcnow()
     default_day = utc.format('YYYY-MM-DD')
-    return render_template('schedule.html',defaultDay=default_day,all_teams=teams)
+    return render_template('schedule.html',defaultDay=default_day,all_teams=teams, version=APP_VERSION)
 
 @app.route('/schedule/<team_id>')
 def get_schedule_team(team_id):
@@ -476,7 +477,7 @@ def get_schedule_team(team_id):
     teams = hockeyHelp.get_all_teams()
     utc = arrow.utcnow()
     default_day = utc.format('YYYY-MM-DD')
-    return render_template('schedule.html',defaultDay=default_day,team=team_id,all_teams=teams)
+    return render_template('schedule.html',defaultDay=default_day,team=team_id,all_teams=teams, version=APP_VERSION)
 
 @app.route('/mock')
 def get_mock():
