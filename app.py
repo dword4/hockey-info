@@ -6,7 +6,7 @@ import json
 import arrow
 import subprocess
 
-requests_cache.install_cache('hockey_cache', expire_after=300)
+#requests_cache.install_cache('hockey_cache', expire_after=300)
 
 app = Flask(__name__)
 if __name__ == "__main__":
@@ -20,14 +20,13 @@ def show_playoffs():
         h = get_headlines()
         hockeyHelp = Helpers()
         teams = hockeyHelp.get_all_teams()
-        print(h)
-        if get_season_status == "P":
-            url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season=20182019'
-
+        sid = hockeyHelp.get_current_season()
+        if get_season_status() == "P":
+            url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season='+str(sid)
             r = requests.get(url).json()
             playoff_msg = []
             current_round = r['defaultRound']
-            for series in r['rounds'][current_round-1]['series']:
+            for series in r['rounds'][current_round]['series']:
                     playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
             return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h,all_teams=teams)
         else:

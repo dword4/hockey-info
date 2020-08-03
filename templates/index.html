@@ -36,7 +36,7 @@
 	{% if playoff_round is defined %}
 	<h1>Playoffs - Round {{ playoff_round }}</h1>
 	{% endif %}
-	<table style="font-size: 32px;">
+    <table class="table table-striped" style="font-size: 26;">
 	{% for m in matches %}
 	<tr>
 	<td>{{ m.matchup }}</td>
