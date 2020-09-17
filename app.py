@@ -320,7 +320,7 @@ def get_team_playoffs(team_id):
                     stats_otg = player_stats['overTimeGoals']
                     stats_s = player_stats['shots']
                     stats_sp = player_stats['shotPct']
-                    statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim, 'PPG': stats_ppg, 'S': stats_s}    
+                    statline = {'NAME':player_name,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim, 'PPG': stats_ppg, 'S': stats_s, 'POSITION': player_position}    
                     ps.append(statline)
             except:
                 # no stats found
