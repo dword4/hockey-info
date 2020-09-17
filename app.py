@@ -1,5 +1,4 @@
 from flask import Flask, render_template, send_from_directory
-from flask_compress import Compress
 
 from Helpers import *
 import requests
@@ -9,10 +8,8 @@ import arrow
 import subprocess
 
 #requests_cache.install_cache('hockey_cache', expire_after=300)
-compress = Compress()
 app = Flask(__name__)
 if __name__ == "__main__":
-    compress.init_app(app) 
     app.run(host="0.0.0.0", port=int("5000"), threaded=True)
 
 # version display stuff
