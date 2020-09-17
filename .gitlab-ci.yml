@@ -21,10 +21,7 @@ cache:
 before_script:
   - python -V               # Print out python version for debugging
   - pip install pytest
-  - pip install flask
-  - pip install requests
-  - pip install requests-cache
-  - pip install arrow
+  - pip install -r requirements.txt
   - pip install virtualenv
   - virtualenv venv
   - source venv/bin/activate
