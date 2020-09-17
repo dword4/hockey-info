@@ -1,4 +1,6 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
+from flask_compress import Compress
+
 from Helpers import *
 import requests
 import requests_cache
@@ -7,14 +9,18 @@ import arrow
 import subprocess
 
 #requests_cache.install_cache('hockey_cache', expire_after=300)
-
+compress = Compress()
 app = Flask(__name__)
 if __name__ == "__main__":
+    compress.init_app(app) 
     app.run(host="0.0.0.0", port=int("5000"), threaded=True)
 
 # version display stuff
 APP_VERSION = subprocess.check_output(["git","rev-parse","HEAD"]).strip().decode("utf-8")
-
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.apth.join(app.root_path, 'static'),
+        'favicon.ico', mimetype='image/vnd.microsoft.icon')
 @app.route('/')
 def show_playoffs():
         h = get_headlines()
