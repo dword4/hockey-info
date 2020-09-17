@@ -241,7 +241,6 @@ def get_team(team_id):
     # now we do goalie stats
 
     url = 'https://api.nhle.com/stats/rest/en/goalie/summary?isAggregate=false&isGame=false&sort=%5B%7B%22property%22:%22wins%22,%22direction%22:%22DESC%22%7D,%7B%22property%22:%22savePct%22,%22direction%22:%22DESC%22%7D%5D&start=0&limit=50&factCayenneExp=gamesPlayed%3E=1&cayenneExp=franchiseId%3D'+str(fid)+'%20and%20gameTypeId=2%20and%20seasonId%3C='+str(sid)+'%20and%20seasonId%3E='+str(sid)
-    print(url)
     records = requests.get(url).json()
     # desired stats: S/C(Shoots/Catches), GP, GS, W, L, OT (Overtime Losses), SA (Shots Against), Svs (Saves), GA (Goals Against), Sv% (Save %) GAA (Goals-Against-Avg), TOI, PIM
     roster = records['data']
@@ -288,6 +287,7 @@ def get_team_playoffs(team_id):
     hockeyHelp = Helpers()
     teams = hockeyHelp.get_all_teams()
     sid = hockeyHelp.get_current_season()
+    fid = hockeyHelp.team_to_franchise(team_id)
     url = 'https://statsapi.web.nhl.com/api/v1/teams/'+team_id+'?hydrate=franchise(roster(season='+str(sid)+',person(name,stats(splits=[statsSingleSeasonPlayoffs]))))'
 
     team_playoff_status = check_team_playoffs_stats(team_id, str(sid))
@@ -325,8 +325,49 @@ def get_team_playoffs(team_id):
             except:
                 # no stats found
                 pass
+        
+        # now lets do goalies
+        url = 'https://api.nhle.com/stats/rest/en/goalie/summary?isAggregate=false&isGame=false&sort=%5B%7B%22property%22:%22wins%22,%22direction%22:%22DESC%22%7D,%7B%22property%22:%22savePct%22,%22direction%22:%22DESC%22%7D%5D&start=0&limit=50&factCayenneExp=gamesPlayed%3E=1&cayenneExp=franchiseId%3D'+str(fid)+'%20and%20gameTypeId=3%20and%20seasonId%3C='+str(sid)+'%20and%20seasonId%3E='+str(sid)
+        records = requests.get(url).json()
+        # desired stats: S/C(Shoots/Catches), GP, GS, W, L, OT (Overtime Losses), SA (Shots Against), Svs (Saves), GA (Goals Against), Sv% (Save %) GAA (Goals-Against-Avg), TOI, PIM
+        roster = records['data']
+        gs = []
+        for goalie in roster:
+            stats_gp = goalie['gamesPlayed']
+            stats_gs = goalie['gamesStarted']
+            stats_w = goalie['wins']
+            stats_l = goalie['losses']
+            stats_ot = goalie['otLosses']
+            stats_sa = goalie['shotsAgainst']
+            stats_svs = goalie['saves']
+            if goalie['savePct'] == None:
+                stats_svp = 0
+            else:
+                stats_svp = goalie['savePct']
+            stats_sc = goalie['shootsCatches']
+            stats_ga = goalie['goalsAgainst']
+            stats_gaa = goalie['goalsAgainstAverage']
+            stats_toi = goalie['timeOnIce']
+            stats_pim = goalie['penaltyMinutes']
+            statline = {
+            'NAME': goalie['goalieFullName'],
+            'SC': stats_sc,
+            'GP': stats_gp,
+            'GS': stats_gs,
+            'W': stats_w,
+            'L': stats_l,
+            'OT': stats_ot,
+            'SA': stats_sa,
+            'SVS': stats_svs,
+            'SVP': round(stats_svp,2),
+            'GA': stats_ga,
+            'GAA': round(stats_gaa,2),
+            'TOI': round(stats_toi/60),
+            'PIM': stats_pim
+            }
+            gs.append(statline)
+        return render_template('team-playoffs.html', t=team_id, roster_stats=ps, goalie_stats=gs, all_teams=teams, version=APP_VERSION)
 
-        return render_template('team-playoffs.html', t=team_id, roster_stats=ps, all_teams=teams, version=APP_VERSION)
 @app.route('/standings')
 def get_standings():
     # first we gather the regular standings
@@ -334,7 +375,6 @@ def get_standings():
     teams = hockeyHelp.get_all_teams()
     sid = hockeyHelp.get_current_season()
     url = 'https://statsapi.web.nhl.com/api/v1/standings/byDivision?season='+sid
-    print(url)
     records = requests.get(url).json()
     # 0 -> metro, 1-> atlantic, 2 -> central 3-> pacific
     standings = []
@@ -342,7 +382,6 @@ def get_standings():
     for r in records['records']:
         conference_name = r['conference']['name']
         division_name = r['division']['name']
-        print("%s - %s " %(conference_name, division_name))
         for team in r['teamRecords']:
             division_name = r['division']['name']
             team_id = team['team']['id']
@@ -627,3 +666,4 @@ def check_team_playoffs_stats(tid, sid):
         return 0 
     else:
         return 1
+
