@@ -13,7 +13,8 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int("5000"), threaded=True)
 
 # version display stuff
-APP_VERSION = subprocess.check_output(["git","rev-parse","HEAD"]).strip().decode("utf-8")
+#APP_VERSION = subprocess.check_output(["git","rev-parse","HEAD"]).strip().decode("utf-8")
+APP_VERSION = "1.0"
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.apth.join(app.root_path, 'static'),
