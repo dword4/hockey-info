@@ -26,7 +26,13 @@ before_script:
   - virtualenv venv
   - source venv/bin/activate
 
+stages:
+  - test
+  - build
+  - deploy
+
 test:
+  stage: test
   script:
   - pytest -v app_test.py
 
@@ -49,6 +55,7 @@ deploy-production:
   script:
     - apt-get update -qy
     - apt-get install -y ruby-dev
+    - apt-get install git
     - gem install dpl
     - dpl --provider=heroku --app=hockey-info --api-key=$HEROKU_PRODUCTION_API_KEY
   only:
