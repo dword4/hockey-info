@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
 # version display stuff
 #APP_VERSION = subprocess.check_output(["git","rev-parse","HEAD"]).strip().decode("utf-8")
-APP_VERSION = "1.0"
+APP_VERSION = "1.1"
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.apth.join(app.root_path, 'static'),
@@ -539,6 +539,8 @@ def schedule_full_season():
         for game in day['games']:
             game_id = game['gamePk']
             game_date = game['gameDate']
+            game_status = game['status']['statusCode']
+
             utc = arrow.get(game_date)
             game_start = utc.to('US/Eastern').format('hh:mm A ZZZ')
 
@@ -548,7 +550,17 @@ def schedule_full_season():
             home_team_id = game['teams']['home']['team']['id']
             home_team_name = game['teams']['home']['team']['name']
             #game_data = {'away_team_id':away_team_id,'away_team_name':away_team_name,'home_team_id':home_team_id,'home_team_name':home_team_name,'game_id':game_id,'start':game_date}
-            game_title = "%s @ %s " % (hockeyHelp.get_team_abbr(away_team_id), hockeyHelp.get_team_abbr(home_team_id))
+            
+            # gather scores if game is over
+            
+            if game_status == "5" or game_status == "6" or game_status == "7":
+                away_team_score = game['teams']['away']['score']
+                home_team_score = game['teams']['home']['score']            
+                game_title = "%s %s @ %s %s" % (hockeyHelp.get_team_abbr(away_team_id), away_team_score, hockeyHelp.get_team_abbr(home_team_id), home_team_score)
+            else:
+                # no scores for games that havent been played or finished yet
+                game_title = "%s @ %s " % (hockeyHelp.get_team_abbr(away_team_id), hockeyHelp.get_team_abbr(home_team_id))
+  
             game_data = {
                     'title': game_title,
                     'start': game_date,
@@ -569,16 +581,30 @@ def schedule_full_season_team(team_id):
         for game in day['games']:
             game_id = game['gamePk']
             game_date = game['gameDate']
+            game_status = game['status']['statusCode']
             utc = arrow.get(game_date)
             game_start = utc.to('US/Eastern').format('hh:mm A ZZZ')
 
             away_team_id = game['teams']['away']['team']['id']
             away_team_name = game['teams']['away']['team']['name']
+            
 
             home_team_id = game['teams']['home']['team']['id']
             home_team_name = game['teams']['home']['team']['name']
+            
+
+            # gather scores if game is over
+            
+            if game_status == "5" or game_status == "6" or game_status == "7":
+                away_team_score = game['teams']['away']['score']
+                home_team_score = game['teams']['home']['score']            
+                game_title = "%s %s @ %s %s" % (hockeyHelp.get_team_abbr(away_team_id), away_team_score, hockeyHelp.get_team_abbr(home_team_id), home_team_score)
+            else:
+                # no scores for games that havent been played or finished yet
+                game_title = "%s @ %s " % (hockeyHelp.get_team_abbr(away_team_id), hockeyHelp.get_team_abbr(home_team_id))
+  
             #game_data = {'away_team_id':away_team_id,'away_team_name':away_team_name,'home_team_id':home_team_id,'home_team_name':home_team_name,'game_id':game_id,'start':game_date}
-            game_title = "%s @ %s " % (hockeyHelp.get_team_abbr(away_team_id), hockeyHelp.get_team_abbr(home_team_id))
+
             game_data = {
                     'title': game_title,
                     'start': game_date,
