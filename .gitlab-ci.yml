@@ -50,13 +50,3 @@ build-master:
   only:
     - master
 
-deploy-production:
-  stage: deploy
-  script:
-    - apt-get update -qy
-    - apt-get install -y ruby-dev
-    - apt-get install git
-    - gem install dpl
-    - dpl --provider=heroku --app=hockey-info --api-key=$HEROKU_PRODUCTION_API_KEY
-  only:
-    - master
