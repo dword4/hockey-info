@@ -19,12 +19,24 @@ APP_VERSION = "1.1"
 def favicon():
     return send_from_directory(os.apth.join(app.root_path, 'static'),
         'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+@app.route('/slick')
+def slick():
+    hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
+    games_data = hockeyHelp.games_to_date()
+    last_game_data = games_data[len(games_data)-2]
+    return render_template('slick.html', games=games_data,last_game=last_game_data,all_teams=teams)
 @app.route('/')
 def show_playoffs():
         h = get_headlines()
         hockeyHelp = Helpers()
         teams = hockeyHelp.get_all_teams()
         sid = hockeyHelp.get_current_season()
+
+        games_data = hockeyHelp.games_to_date()
+        last_game_data = games_data[len(games_data)-2]
+
         if get_season_status() == "P":
             url = 'https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?site=en_nhl&expand=round.series,schedule.game.seriesSummary,schedule.game&season='+str(sid)
             r = requests.get(url).json()
@@ -32,9 +44,9 @@ def show_playoffs():
             current_round = r['defaultRound']
             for series in r['rounds'][current_round]['series']:
                     playoff_msg.append({'matchup': series['names']['matchupShortName'], 'status': series['currentGame']['seriesSummary']['seriesStatus']})
-            return render_template('index.html', matches=playoff_msg, playoff_round=current_round,headlines=h,all_teams=teams,version=APP_VERSION)
+            return render_template('index.html', last_game=last_game_data,games=games_data,matches=playoff_msg, playoff_round=current_round,headlines=h,all_teams=teams,version=APP_VERSION)
         else:
-            return render_template('index.html', headlines=h,all_teams=teams,version=APP_VERSION)
+            return render_template('index.html', last_game=last_game_data, games=games_data, headlines=h,all_teams=teams,version=APP_VERSION)
 
 # game.types [ P = Playoffs, PR = Preasons, R = Regular , N = NO HOCKEY]
 def get_season_status():

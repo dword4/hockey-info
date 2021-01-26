@@ -10,6 +10,45 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <!-- flickity -->
+  <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
+  <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+	<style>
+	.carousel-cell {
+		height: 100px;
+		width: 100px;
+		padding: 3px;	
+		background: #F2F2F2;
+		border: 0.5px solid #A9A9A9;
+	}
+	/* smaller, dark, rounded square */
+	.flickity-button {
+	  background: #333;
+	}
+	.flickity-button:hover {
+	  background: #F90;
+	}
+
+	.flickity-prev-next-button {
+	  width: 30px;
+	  height: 30px;
+	  border-radius: 5px;
+	}
+	/* icon color */
+	.flickity-button-icon {
+	  fill: white;
+	}
+	/* position outside */
+	.flickity-prev-next-button.previous {
+	  left: -40px;
+	}
+	.flickity-prev-next-button.next {
+	  right: -40px;
+	}
+	.carousel-cell.is-selected {
+	  background: #D2D2D2;
+	}
+	</style>
 </head>
 <body>
 	<ul class="nav nav-tabs nav-justified bg-danger text-light">
@@ -34,6 +73,28 @@
 	</ul>
 <body>
 <!-- BEGIN ACTUAL DATA -->
+
+<!-- scores carousel -->
+	<div class="main-carousel" data-flickity='{ "cellAlign": "center", "contain": true, "wrapAround": true, "pageDots": false, "initialIndex": ".is-initial-select"}' style="width: 90%;left: 5%; right: 5%;">
+    {% for game in games %}
+		{% if game.gamePk is number and game.gamePk == last_game.gamePk %}
+		<div class="carousel-cell is-initial-select">
+        <a href="/game/{{ game.gamePk }}">
+        {{ game.away_team_abbr }}: {{ game.away_team_score }}<br /> {{ game.home_team_abbr }}: {{ game.home_team_score }}
+		</a><br /><strong>{{ game.gameState }}</strong> {{ game.gameDate }}
+		</div>
+		{% elif game.gamePk is number %}
+		<div class="carousel-cell">
+        <a href="/game/{{ game.gamePk }}">
+        {{ game.away_team_abbr }}: {{ game.away_team_score }}<br /> {{ game.home_team_abbr }}: {{ game.home_team_score }}
+		</a><br /><strong>{{ game.gameState }}</strong><br /> {{ game.gameDate }}
+		</div>
+		{% else %}
+			&nbsp;
+		{% endif %}
+    {% endfor %}
+	</div>
+<!-- end scores carousel -->
 	{% if playoff_round is defined %}
 	<h1>Playoffs - Round {{ playoff_round }}</h1>
 	{% endif %}
