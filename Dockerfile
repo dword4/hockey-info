@@ -1,5 +1,4 @@
 FROM alpine:3.9
-MAINTAINER Drew Hynes <drew.hynes@gmail.com>
 
 # update
 RUN apk update
