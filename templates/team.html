@@ -90,7 +90,7 @@ $(document).ready( function () {
 	<tbody>
 		{% for p in roster_stats %}
 		<tr>
-			<td>{{ p.NAME }}</td>
+            <td><a href="/player/{{ p.ID }}">{{ p.NAME }}</a></td>
 			<td>{{ p.POSITION }}</td>
 			<td>{{ p.GP }}</td>
 			<td>{{ p.G }}</td>

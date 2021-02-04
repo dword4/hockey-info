@@ -8,7 +8,7 @@ RUN mkdir -p /hockey-info
 WORKDIR /hockey-info
 RUN apk add git
 RUN apk add py-pip
-RUN git clone https://gitlab.com/dword4/hockey-info.git .
+COPY . /hockey-info
 RUN pip install -r requirements.txt
 
 # set timezone

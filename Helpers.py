@@ -21,7 +21,6 @@ class Helpers(object):
         previous_games = []
 
         for date in games_data['dates']:
-            print(date['date'])
             games = date['games']
             for game in games:
                 gameDate = date['date']

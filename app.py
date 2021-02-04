@@ -6,6 +6,7 @@ import requests_cache
 import json
 import arrow
 import subprocess
+import os
 
 #requests_cache.install_cache('hockey_cache', expire_after=300)
 app = Flask(__name__)
@@ -17,7 +18,7 @@ if __name__ == "__main__":
 APP_VERSION = "1.2"
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.apth.join(app.root_path, 'static'),
+    return send_from_directory(os.path.join(app.root_path, 'static'),
         'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/slick')
@@ -27,6 +28,18 @@ def slick():
     games_data = hockeyHelp.games_to_date()
     last_game_data = games_data[len(games_data)-2]
     return render_template('slick.html', games=games_data,last_game=last_game_data,all_teams=teams)
+
+@app.route('/player/<player_id>')
+def player(player_id):
+    hockeyHelp = Helpers()
+    teams = hockeyHelp.get_all_teams()
+
+    url = 'https://statsapi.web.nhl.com/api/v1/people/'+player_id
+    r = requests.get(url).json()
+    player_info = r['people'][0]
+
+    return render_template('player.html', player=player_info,all_teams=teams,version=APP_VERSION)
+
 @app.route('/')
 def show_playoffs():
         h = get_headlines()
@@ -229,6 +242,7 @@ def get_team(team_id):
     ps = []
     for player in roster:
         player_name = player['person']['fullName']
+        player_id = player['person']['id']
         player_position = player['person']['primaryPosition']['code']
         try:
             player_stats = player['person']['stats'][0]['splits'][0]['stat']
@@ -247,7 +261,7 @@ def get_team(team_id):
                 stats_otg = player_stats['overTimeGoals']
                 stats_s = player_stats['shots']
                 stats_sp = player_stats['shotPct']
-                statline = {'NAME':player_name,'POSITION': player_position,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim, 'PPG': stats_ppg, 'S': stats_s}    
+                statline = {'ID': player_id, 'NAME':player_name,'POSITION': player_position,'GP':stats_gp,'G':stats_g,'A':stats_a,'P':stats_p,'PLUS':stats_plusMinus,'PIM':stats_pim, 'PPG': stats_ppg, 'S': stats_s}    
                 ps.append(statline)
         except:
             # no stats found
