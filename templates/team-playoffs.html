@@ -13,6 +13,17 @@
     
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js"></script>
+<!-- counter.dev analytics -->                                                                                                                    
+  <script> // counter.dev tracking code                                                                                                             
+      if (!sessionStorage.getItem("_swa") && document.referrer.indexOf(location.protocol + "//" + location.host) !== 0) {                           
+                            fetch("https://counter.dev/track?" + new URLSearchParams({                                                              
+                                                      referrer: document.referrer,                                                                  
+                                                      screen: screen.width + "x" + screen.height,                                                   
+                                                      user: "dword4",                                                                               
+                                                      utcoffset: -5}));}                                                                            
+      sessionStorage.setItem("_swa", "1");                                                                                                          
+  </script>                                                                                                                                         
+  <!-- end counter.dev -->  
 </head>
 <body>
 	<ul class="nav nav-tabs nav-justified bg-danger text-light">

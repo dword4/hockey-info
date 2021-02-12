@@ -10,7 +10,17 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
+	<!-- counter.dev analytics -->                                                                                                                    
+	  <script> // counter.dev tracking code                                                                                                             
+		  if (!sessionStorage.getItem("_swa") && document.referrer.indexOf(location.protocol + "//" + location.host) !== 0) {                           
+								fetch("https://counter.dev/track?" + new URLSearchParams({                                                              
+														  referrer: document.referrer,                                                                  
+														  screen: screen.width + "x" + screen.height,                                                   
+														  user: "dword4",                                                                               
+														  utcoffset: -5}));}                                                                            
+		  sessionStorage.setItem("_swa", "1");                                                                                                          
+	  </script>                                                                                                                                         
+  <!-- end counter.dev -->  
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 
 <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script> 

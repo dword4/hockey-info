@@ -10,6 +10,17 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
   <script src="https://code.iconify.design/1/1.0.3/iconify.min.js"></script>
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <!-- counter.dev analytics -->
+  <script> // counter.dev tracking code
+      if (!sessionStorage.getItem("_swa") && document.referrer.indexOf(location.protocol + "//" + location.host) !== 0) {
+                            fetch("https://counter.dev/track?" + new URLSearchParams({
+                                                      referrer: document.referrer,
+                                                      screen: screen.width + "x" + screen.height,
+                                                      user: "dword4",
+                                                      utcoffset: -5}));}
+      sessionStorage.setItem("_swa", "1");
+  </script>
+  <!-- end counter.dev -->
   <!-- flickity -->
   <link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
   <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
