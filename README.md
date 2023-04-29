@@ -9,6 +9,25 @@ I do this for fun, there is absolutely no warranty or guarantee with any of this
 I don't have rights to anything the NHL does, just another hockey nerd that knows
 a few neat programming tricks trying to help others absolutely
 
+
+# Python Virtual Env Setup (venv)
+---
+It is best practice to setup an isolated Python3 "virtual environment" for any
+project. Many IDEs may do this for you, automatically. However, if you need to
+do this yourself, this is the basic method:
+
+    python3 -m venv venv-hockey
+    . ./venv-hockey/bin/activate
+    pip install pip setuptools wheel --upgrade
+    pip install -r requirements.txt
+
+You can then work within this project without affecting other Python envs, or
+your system installation. Once you are done, you should be sure to deactivate
+the environment.
+
+    deactivate
+
+
 # How to run it?
 ---
 ```
