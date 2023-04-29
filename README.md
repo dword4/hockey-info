@@ -1,7 +1,9 @@
 # hockey-info
 ---
-An app written in Python utilizing Flask and the NHL API to present hockey data
-in a simple and easy to view manner with a focus on mobile users
+An app written in Python utilizing [Flask](https://flask.palletsprojects.com/)
+and the NHL API to present hockey data in a simple and easy to view manner with
+a focus on mobile users
+
 
 # Disclaimer
 ---
