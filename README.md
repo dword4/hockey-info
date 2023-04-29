@@ -35,7 +35,7 @@ export FLASK_APP=app.py
 flask run
 ```
 It will start a server running on localhost and accessible on port 5000 (http://127.0.0.1:5000/)
-q
+
 If you need to run it on a different port invoke flask thusly
 
 ```
