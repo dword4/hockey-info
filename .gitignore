@@ -24,3 +24,11 @@ htmlcov/
 .coverage.*
 *,cover
 
+# PyEnv
+.python-version
+
+# Python VEnv
+*venv*/
+
+# Vim
+*.swp
