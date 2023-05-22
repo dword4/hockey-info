@@ -1,5 +1,5 @@
 Flask==1.0.2
-Requests==2.21.0
+Requests==2.31.0
 arrow==0.13.1
 requests-cache==0.4.13
 gunicorn
